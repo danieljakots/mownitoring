@@ -1,0 +1,61 @@
+machines:
+  - webserver
+  - database
+  - mailserver
+
+
+webserver:
+  - checks:
+      - disk1
+      - load
+      - ssh
+      - haproxy
+      - http
+      - https
+      - ssl
+  - connection:
+      ip: "192.0.2.1"
+      port: "5666"
+  - alert:
+      - pushover
+
+
+database:
+  - checks:
+      - disk1
+      - load
+      - ssh
+  - connection:
+      ip: "192.0.2.2"
+      port: "5666"
+  - alert:
+      - pushover
+
+
+mailserver:
+  - checks:
+      - disk1
+      - load
+      - ssh
+      - mailq
+      - imap
+  - connection:
+      ip: "192.0.2.3"
+      port: "5666"
+  - alert:
+      - pushover
+      - twilio
+
+
+Twilio:
+  account_sid: "11235811"
+  auth_token: "3141592654"
+  sender: "+14385556677"
+  api_url: "https://api.twilio.com/2010-04-01/Accounts/11235811/Messages"
+
+
+Pushover:
+  token: "T0k3n"
+  user: "johndoe"
+  active: "True"
+  api_url: "https://api.pushover.net/1/messages.json"
