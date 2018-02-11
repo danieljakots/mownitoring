@@ -32,8 +32,8 @@ def check_nrpe(check, host, port):
 def check_alert(check, host, port):
     """Check, and alert if needed."""
     status, message = check_nrpe(check, host, port)
-    if status == 2:
-        notify_pushover(message)
+    if status != 0:
+        notify_pushover(machine + " " + message)
 
 
 def read_conf(config_file):
