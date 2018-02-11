@@ -12,10 +12,6 @@ class TestMownitoing(unittest.TestCase):
         machines = mownitoring.read_conf(config_file)
 
         # api_cfg
-        self.assertEqual(mownitoring.api_cfg["twilio_api_url"],
-                         "https://api.twilio.com/2010-04-01/Accounts/" +
-                         mownitoring.api_cfg["twilio_account_sid"] +
-                         "/Messages")
         self.assertEqual(mownitoring.api_cfg["pushover_token"],
                          "T0k3n")
 
@@ -26,9 +22,9 @@ class TestMownitoing(unittest.TestCase):
                          "192.0.2.2")
         self.assertIn("mailq", machines["mail.example.com"][0]["checks"])
 
-        self.assertIn("twilio", machines["mail.example.com"][1]["alert"])
+        self.assertIn("pushover", machines["db.example.com"][1]["alert"])
+        self.assertIn("syslog", machines["db.example.com"][1]["alert"])
 
-        self.assertNotIn("twilio_auth_token", machines)
         self.assertNotIn("pushover_token", machines)
 
 

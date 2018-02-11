@@ -61,15 +61,6 @@ def read_conf(config_file):
     except KeyError:
         syslog.syslog(syslog.LOG_ERR, "Pushover config couldn't be parsed")
 
-    # twilio api key
-    try:
-        api_cfg["twilio_account_sid"] = yaml_cfg["Twilio"]["account_sid"]
-        api_cfg["twilio_auth_token"] = yaml_cfg["Twilio"]["auth_token"]
-        api_cfg["twilio_available_number"] = yaml_cfg["Twilio"]["sender"]
-        api_cfg["twilio_api_url"] = yaml_cfg["Twilio"]["api_url"]
-    except KeyError:
-        syslog.syslog(syslog.LOG_ERR, "Twilio config couldn't be parsed")
-
     # monitored machines
     machines = {}
     for machine in yaml_cfg["machines"]:

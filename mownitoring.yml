@@ -24,6 +24,7 @@ db.example.com:
       - ssh
   - alert:
       - pushover
+      - syslog
   - connection:
       ip: "192.0.2.2"
       port: "5667"
@@ -38,17 +39,9 @@ mail.example.com:
       - imap
   - alert:
       - pushover
-      - twilio
   - connection:
       ip: "192.0.2.3"
       port: "5666"
-
-
-Twilio:
-  account_sid: "11235811"
-  auth_token: "3141592654"
-  sender: "+14385556677"
-  api_url: "https://api.twilio.com/2010-04-01/Accounts/11235811/Messages"
 
 
 Pushover:
