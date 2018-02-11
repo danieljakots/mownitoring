@@ -96,6 +96,7 @@ def read_conf(config_file):
 
 
 def main():
+    syslog.syslog("mownitoring starts")
     for machine in machines.keys():
         for check in machines[machine][0]["checks"]:
             try:
@@ -105,6 +106,7 @@ def main():
                 host = machine
                 port = "5666"
             check_alert(check, host, port, machine)
+    syslog.syslog("mownitoring ends")
 
 
 if __name__ == "__main__":
