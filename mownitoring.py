@@ -91,19 +91,6 @@ def read_conf(config_file):
     return machines
 
 
-def debug():
-    for machine in machines.keys():
-        print(machine)
-        for check in machines[machine][0]["checks"]:
-            print("  " + check)
-        try:
-            print("  connection")
-            print("     " + machines[machine][2]["connection"]["ip"])
-            print("     " + machines[machine][2]["connection"]["port"])
-        except KeyError:
-            pass
-
-
 def main():
     for machine in machines.keys():
         for check in machines[machine][0]["checks"]:
@@ -118,5 +105,4 @@ def main():
 
 if __name__ == "__main__":
     machines = read_conf(CONFIG_FILE)
-    #debug()
     main()
