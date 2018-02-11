@@ -3,9 +3,20 @@
 import subprocess
 import syslog
 
+import requests
 import yaml
 
 CONFIG_FILE = "/etc/mownitoring.yml"
+
+
+def notify_pushover(alert):
+    """Send a pushover notification."""
+    payload = {"token": api_cfg["pushover_token"],
+               "user": api_cfg["pushover_user"],
+               "message": alert}
+
+    requests.post(api_cfg["pushover_api_url"], params=payload)
+
 
 
 def checknrpe(check, host, port):
