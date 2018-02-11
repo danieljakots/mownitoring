@@ -99,11 +99,9 @@ def main():
     for machine in machines.keys():
         for check in machines[machine][0]["checks"]:
             try:
-                name = machine
                 host = machines[machine][2]["connection"]["ip"]
                 port = machines[machine][2]["connection"]["port"]
             except KeyError:
-                name = machine
                 host = machine
                 port = "5666"
             check_alert(check, host, port, machine)
