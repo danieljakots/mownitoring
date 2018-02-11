@@ -1,10 +1,19 @@
 #!/usr/bin/env python3
 
+import subprocess
 import syslog
 
 import yaml
 
 CONFIG_FILE = "/etc/mownitoring.yml"
+
+
+def checknrpe(check, host, port):
+    """Run a given check for a specified host."""
+    subprocess.run(["/usr/local/libexec/nagios/check_nrpe",
+                    "-H" + host,
+                    "-ccheck_" + check,
+                    "-p" + port])
 
 
 def readconf(config_file):
