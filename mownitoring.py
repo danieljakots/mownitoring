@@ -18,6 +18,10 @@ def notify_pushover(alert):
     requests.post(api_cfg["pushover_api_url"], params=payload)
 
 
+def notify_syslog(alert):
+    syslog.syslog(alert)
+
+
 def check_nrpe(check, host, port):
     """Run a given check for a specified host."""
     nrpe = subprocess.run(["/usr/local/libexec/nagios/check_nrpe",
