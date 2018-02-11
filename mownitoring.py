@@ -33,11 +33,21 @@ def check_nrpe(check, host, port):
     return nrpe.returncode, nrpe.stdout
 
 
-def check_alert(check, host, port, machine):
+def notify(notifiers, message):
+    notifiers_available = {"syslog": notify_syslog,
+                           "pushover": notify_pushover}
+    try:
+        for notifier in notifiers:
+            notifiers_available[notifier](message)
+    except KeyError:
+        syslog.syslog(syslog.LOG_ERR, "Unknown notifier configured")
+
+
+def check_alert(check, host, port, machine, notifiers):
     """Check, and alert if needed."""
     status, message = check_nrpe(check, host, port)
     if status != 0:
-        notify_pushover(machine + " " + message)
+        notify(notifiers, machine + "!" + check + " " + message)
 
 
 def read_conf(config_file):
@@ -96,7 +106,8 @@ def main():
             except KeyError:
                 host = machine
                 port = "5666"
-            check_alert(check, host, port, machine)
+            check_alert(check, host, port, machine,
+                        machines[machine][1]["alert"])
     syslog.syslog("mownitoring ends")
 
 
