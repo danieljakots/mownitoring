@@ -29,7 +29,7 @@ def check_nrpe(check, host, port):
     return nrpe.returncode, nrpe.stdout
 
 
-def check_alert(check, host, port):
+def check_alert(check, host, port, machine):
     """Check, and alert if needed."""
     status, message = check_nrpe(check, host, port)
     if status != 0:
@@ -95,12 +95,14 @@ def main():
     for machine in machines.keys():
         for check in machines[machine][0]["checks"]:
             try:
+                name = machine
                 host = machines[machine][2]["connection"]["ip"]
                 port = machines[machine][2]["connection"]["port"]
             except KeyError:
+                name = machine
                 host = machine
                 port = "5666"
-            check_alert(check, host, port)
+            check_alert(check, host, port, machine)
 
 
 if __name__ == "__main__":
