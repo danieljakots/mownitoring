@@ -62,8 +62,32 @@ def readconf(config_file):
     return machines
 
 
-if __name__ == "__main__":
-    machines = readconf(CONFIG_FILE)
-    print(machines)
+def debug():
     for machine in machines.keys():
         print(machine)
+        for check in machines[machine][0]["checks"]:
+            print("  " + check)
+        try:
+            print("  connection")
+            print("     " + machines[machine][2]["connection"]["ip"])
+            print("     " + machines[machine][2]["connection"]["port"])
+        except KeyError:
+            pass
+
+
+def main():
+    for machine in machines.keys():
+        for check in machines[machine][0]["checks"]:
+            try:
+                host = machines[machine][2]["connection"]["ip"]
+                port = machines[machine][2]["connection"]["port"]
+            except KeyError:
+                host = machine
+                port = "5666"
+            checknrpe(check, host, port)
+
+
+if __name__ == "__main__":
+    machines = readconf(CONFIG_FILE)
+    #debug()
+    main()
