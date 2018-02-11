@@ -20,13 +20,13 @@ class TestMownitoing(unittest.TestCase):
                          "T0k3n")
 
         # machines
-        self.assertIsInstance(machines["webserver"][0]["checks"], list)
+        self.assertIsInstance(machines["webserver.example.com"][0]["checks"],
+                              list)
+        self.assertEqual(machines["db.example.com"][2]["connection"]["ip"],
+                         "192.0.2.2")
+        self.assertIn("mailq", machines["mail.example.com"][0]["checks"])
 
-        self.assertEqual(machines["webserver"][1]["connection"]["ip"],
-                         "192.0.2.1")
-        self.assertIn("mailq", machines["mailserver"][0]["checks"])
-
-        self.assertIn("twilio", machines["mailserver"][2]["alert"])
+        self.assertIn("twilio", machines["mail.example.com"][1]["alert"])
 
         self.assertNotIn("twilio_auth_token", machines)
         self.assertNotIn("pushover_token", machines)

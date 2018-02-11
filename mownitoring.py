@@ -37,6 +37,7 @@ def readconf(config_file):
     except KeyError:
         syslog.syslog(syslog.LOG_ERR, "Twilio config couldn't be parsed")
 
+    # monitored machines
     machines = {}
     for machine in yaml_cfg["machines"]:
         machines[machine] = []
@@ -46,14 +47,17 @@ def readconf(config_file):
             machines[machine][0]["checks"].append(check)
 
         machines[machine].append({})
-        machines[machine][1]["connection"] = {}
-        machines[machine][1]["connection"]["ip"] = yaml_cfg[machine][1]["connection"]["ip"]
-        machines[machine][1]["connection"]["port"] = yaml_cfg[machine][1]["connection"]["port"]
+        machines[machine][1]["alert"] = []
+        for alert in yaml_cfg[machine][1]["alert"]:
+            machines[machine][1]["alert"].append(alert)
 
-        machines[machine].append({})
-        machines[machine][2]["alert"] = []
-        for alert in yaml_cfg[machine][2]["alert"]:
-            machines[machine][2]["alert"].append(alert)
+        try:
+            machines[machine].append({})
+            machines[machine][2]["connection"] = {}
+            machines[machine][2]["connection"]["ip"] = yaml_cfg[machine][2]["connection"]["ip"]
+            machines[machine][2]["connection"]["port"] = yaml_cfg[machine][2]["connection"]["port"]
+        except IndexError:
+            pass
 
     return machines
 

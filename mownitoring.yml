@@ -1,10 +1,10 @@
 machines:
-  - webserver
-  - database
-  - mailserver
+  - webserver.example.com
+  - db.example.com
+  - mail.example.com
 
 
-webserver:
+webserver.example.com:
   - checks:
       - disk1
       - load
@@ -13,38 +13,35 @@ webserver:
       - http
       - https
       - ssl
-  - connection:
-      ip: "192.0.2.1"
-      port: "5666"
   - alert:
       - pushover
 
 
-database:
+db.example.com:
   - checks:
       - disk1
       - load
       - ssh
-  - connection:
-      ip: "192.0.2.2"
-      port: "5666"
   - alert:
       - pushover
+  - connection:
+      ip: "192.0.2.2"
+      port: "5667"
 
 
-mailserver:
+mail.example.com:
   - checks:
       - disk1
       - load
       - ssh
       - mailq
       - imap
-  - connection:
-      ip: "192.0.2.3"
-      port: "5666"
   - alert:
       - pushover
       - twilio
+  - connection:
+      ip: "192.0.2.3"
+      port: "5666"
 
 
 Twilio:
