@@ -21,11 +21,11 @@ def notify_pushover(alert):
 def check_nrpe(check, host, port):
     """Run a given check for a specified host."""
     nrpe = subprocess.run(["/usr/local/libexec/nagios/check_nrpe",
-                    "-H" + host,
-                    "-ccheck_" + check,
-                    "-p" + port],
-                    stdout=subprocess.PIPE,
-                    universal_newlines=True)
+                           "-H" + host,
+                           "-ccheck_" + check,
+                           "-p" + port],
+                          stdout=subprocess.PIPE,
+                          universal_newlines=True)
     return nrpe.returncode, nrpe.stdout
 
 
