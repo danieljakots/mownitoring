@@ -9,7 +9,7 @@ config_file = "./mownitoring.yml"
 class TestMownitoing(unittest.TestCase):
 
     def test_readconf(self):
-        machines = mownitoring.readconf(config_file)
+        machines = mownitoring.read_conf(config_file)
 
         # api_cfg
         self.assertEqual(mownitoring.api_cfg["twilio_api_url"],

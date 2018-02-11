@@ -27,7 +27,7 @@ def checknrpe(check, host, port):
                     "-p" + port])
 
 
-def readconf(config_file):
+def read_conf(config_file):
     """Parse the configuration file.
 
     It uses 2 data structures:
@@ -104,10 +104,10 @@ def main():
             except KeyError:
                 host = machine
                 port = "5666"
-            checknrpe(check, host, port)
+            check_alert(check, host, port)
 
 
 if __name__ == "__main__":
-    machines = readconf(CONFIG_FILE)
+    machines = read_conf(CONFIG_FILE)
     #debug()
     main()
