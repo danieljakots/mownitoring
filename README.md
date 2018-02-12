@@ -1,7 +1,7 @@
 # Mownitoring
 
-The name is a mix between 'monitoring', 'chown.me' (the domain I rent)
-and it kinda sounds like 'moan'.
+'My own monitoring'. Which is also a mix between 'monitoring',
+'chown.me' (the domain I rent) and it kinda sounds like 'moan'.
 
 # Status
 
