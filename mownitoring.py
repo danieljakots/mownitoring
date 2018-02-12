@@ -65,9 +65,14 @@ def read_conf(config_file):
     api_cfg = {}
     # pushover
     try:
-        api_cfg["pushover_token"] = yaml_cfg["Alerting_credentials"][0]["Pushover"]["token"]
-        api_cfg["pushover_user"] = yaml_cfg["Alerting_credentials"][0]["Pushover"]["user"]
-        api_cfg["pushover_api_url"] = yaml_cfg["Alerting_credentials"][0]["Pushover"]["api_url"]
+        api_cfg = {
+            "pushover_token":
+            yaml_cfg["Alerting_credentials"][0]["Pushover"]["token"],
+            "pushover_user":
+            yaml_cfg["Alerting_credentials"][0]["Pushover"]["user"],
+            "pushover_api_url":
+            yaml_cfg["Alerting_credentials"][0]["Pushover"]["api_url"]
+            }
     except KeyError:
         syslog.syslog(syslog.LOG_ERR, "Pushover config couldn't be parsed")
 
