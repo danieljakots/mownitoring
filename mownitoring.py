@@ -19,7 +19,7 @@ def notify_pushover(alert):
 
 
 def notify_syslog(alert):
-    syslog.syslog(alert)
+    syslog.syslog(syslog.LOG_WARNING,alert)
 
 
 def check_nrpe(check, host, port):
