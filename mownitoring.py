@@ -37,11 +37,11 @@ def check_nrpe(check, host, port):
 def notify(notifiers, message):
     notifiers_available = {"syslog": notify_syslog,
                            "pushover": notify_pushover}
-    try:
-        for notifier in notifiers:
+    for notifier in notifiers:
+        try:
             notifiers_available[notifier](message)
-    except KeyError:
-        syslog.syslog(syslog.LOG_ERR, "Unknown notifier configured")
+        except KeyError:
+            syslog.syslog(syslog.LOG_ERR, "Unknown notifier configured")
 
 
 def check_alert(check, host, port, machine, notifiers):
