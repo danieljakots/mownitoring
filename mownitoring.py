@@ -16,6 +16,7 @@ def notify_pushover(alert):
                "message": alert}
 
     requests.post(api_cfg["pushover_api_url"], params=payload)
+    syslog.syslog("Alert sent through pushover")
 
 
 def notify_syslog(alert):
