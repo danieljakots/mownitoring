@@ -25,7 +25,9 @@ class TestMownitoing(unittest.TestCase):
         self.assertIn("pushover", machines["db.example.com"][1]["alert"])
         self.assertIn("syslog", machines["db.example.com"][1]["alert"])
 
-        self.assertNotIn("pushover_token", machines)
+        self.assertNotIn("T0k3n", machines)
+        self.assertNotIn("token", machines)
+        self.assertNotIn("Pushover", machines)
 
 
 if __name__ == '__main__':
