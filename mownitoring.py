@@ -82,6 +82,7 @@ def read_conf(config_file):
 
     return machines
 
+
 if __name__ == "__main__":
     syslog.syslog("mownitoring starts")
     machines = read_conf(CONFIG_FILE)
