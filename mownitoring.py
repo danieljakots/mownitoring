@@ -82,22 +82,17 @@ def read_conf(config_file):
 
     return machines
 
-
-def main():
+if __name__ == "__main__":
     syslog.syslog("mownitoring starts")
-    for machine in machines.keys():
+    machines = read_conf(CONFIG_FILE)
+    for machine in machines["machines"]:
         for check in machines[machine][0]["checks"]:
             try:
                 host = machines[machine][2]["connection"]["ip"]
                 port = machines[machine][2]["connection"]["port"]
-            except KeyError:
+            except IndexError:
                 host = machine
                 port = "5666"
             check_alert(check, host, port, machine,
                         machines[machine][1]["alert"])
     syslog.syslog("mownitoring ends")
-
-
-if __name__ == "__main__":
-    machines = read_conf(CONFIG_FILE)
-    main()
