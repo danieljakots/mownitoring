@@ -34,22 +34,29 @@ def check_nrpe(check, host, port):
     return nrpe.returncode, nrpe.stdout
 
 
-def notify(notifiers, message):
+def check_notifier(notifiers):
     notifiers_available = {"syslog": notify_syslog,
                            "pushover": notify_pushover}
+    notifiers_valid = []
     for notifier in notifiers:
         try:
-            notifiers_available[notifier](message)
+            notifiers_valid.append(notifiers_available[notifier])
         except KeyError:
             syslog.syslog(syslog.LOG_ERR, "Unknown notifier " + notifier +
                           " configured")
+    return notifiers_valid
 
 
 def check_alert(check, host, port, machine, notifiers):
     """Check, and alert if needed."""
     status, message = check_nrpe(check, host, port)
     if status != 0:
-        notify(notifiers, machine + "!" + check + " " + message)
+        notifiers_valid = check_notifier(notifiers)
+        if notifiers_valid:
+            for notifier in notifiers_valid:
+                notifier(machine + "!" + check + " " + message)
+        else:
+            syslog.syslog(syslog.LOG_ERR, "No valid notify system")
 
 
 def read_conf(config_file):
