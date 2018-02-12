@@ -72,26 +72,8 @@ def read_conf(config_file):
         syslog.syslog(syslog.LOG_ERR, "Pushover config couldn't be parsed")
 
     # monitored machines
-    machines = {}
-    for machine in yaml_cfg["machines"]:
-        machines[machine] = []
-        machines[machine].append({})
-        machines[machine][0]["checks"] = []
-        for check in yaml_cfg[machine][0]["checks"]:
-            machines[machine][0]["checks"].append(check)
-
-        machines[machine].append({})
-        machines[machine][1]["alert"] = []
-        for alert in yaml_cfg[machine][1]["alert"]:
-            machines[machine][1]["alert"].append(alert)
-
-        try:
-            machines[machine].append({})
-            machines[machine][2]["connection"] = {}
-            machines[machine][2]["connection"]["ip"] = yaml_cfg[machine][2]["connection"]["ip"]
-            machines[machine][2]["connection"]["port"] = yaml_cfg[machine][2]["connection"]["port"]
-        except IndexError:
-            pass
+    machines = yaml_cfg.copy()
+    del machines["Pushover"]
 
     return machines
 
