@@ -29,6 +29,21 @@ class TestMownitoing(unittest.TestCase):
         self.assertNotIn("token", machines)
         self.assertNotIn("Pushover", machines)
 
+    def test_check_notifier(self):
+        test1 = mownitoring.check_notifier(["syslog"])
+        self.assertIsInstance(test1, list)
+        self.assertEqual(test1[0], mownitoring.notify_syslog)
+
+        test2 = mownitoring.check_notifier(["nonexistent"])
+        self.assertEqual(test2, [])
+
+        test3 = mownitoring.check_notifier(["syslog", "pushover"])
+        self.assertEqual(test3[0], mownitoring.notify_syslog)
+        self.assertEqual(test3[1], mownitoring.notify_pushover)
+
+        test4 = mownitoring.check_notifier(["syslog", "nonexistent"])
+        self.assertEqual(test4, [mownitoring.notify_syslog])
+
 
 if __name__ == '__main__':
     unittest.main()
