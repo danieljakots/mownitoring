@@ -41,7 +41,8 @@ def notify(notifiers, message):
         try:
             notifiers_available[notifier](message)
         except KeyError:
-            syslog.syslog(syslog.LOG_ERR, "Unknown notifier configured")
+            syslog.syslog(syslog.LOG_ERR, "Unknown notifier " + notifier +
+                          " configured")
 
 
 def check_alert(check, host, port, machine, notifiers):
