@@ -47,8 +47,8 @@ def check_notifier(notifiers):
     return notifiers_valid
 
 
-def check_alert(check, host, port, machine, notifiers):
-    """Check, and alert if needed."""
+def check_status(check, host, port, machine, notifiers):
+    """Check the status of the check, and alert if needed."""
     status, message = check_nrpe(check, host, port)
     if status != 0:
         notifiers_valid = check_notifier(notifiers)
@@ -103,6 +103,6 @@ if __name__ == "__main__":
             except IndexError:
                 host = machine
                 port = "5666"
-            check_alert(check, host, port, machine,
-                        machines[machine][1]["alert"])
+            check_status(check, host, port, machine,
+                         machines[machine][1]["alert"])
     syslog.syslog("mownitoring ends")

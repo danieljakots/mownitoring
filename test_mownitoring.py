@@ -50,13 +50,13 @@ class TestMownitoing(unittest.TestCase):
     @patch('syslog.syslog')
     @patch('mownitoring.check_notifier')
     @patch('mownitoring.notify_syslog')
-    def test_check_alert(self, mock_syslog, mock_check_notifier,
-                         mock_notify_syslog):
+    def test_check_status(self, mock_syslog, mock_check_notifier,
+                          mock_notify_syslog):
         mownitoring.check_nrpe = Mock()
         mownitoring.check_nrpe.return_value = 2, 'disk nok'
         mock_check_notifier.return_value = [mownitoring.notify_syslog]
-        mownitoring.check_alert("disk1", "webserver.example.com", "5666",
-                                "webserver.example.com", ["syslog"])
+        mownitoring.check_status("disk1", "webserver.example.com", "5666",
+                                 "webserver.example.com", ["syslog"])
         mock_syslog.assert_called_once_with("webserver.example.com!" +
                                             "disk1 disk nok")
 
