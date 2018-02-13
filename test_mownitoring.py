@@ -8,7 +8,7 @@ import mownitoring
 config_file = "./mownitoring.yml"
 
 
-class TestMownitoing(unittest.TestCase):
+class TestMownitoring(unittest.TestCase):
 
     def test_readconf(self):
         machines = mownitoring.read_conf(config_file)
