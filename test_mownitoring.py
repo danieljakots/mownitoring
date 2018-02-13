@@ -47,6 +47,17 @@ class TestMownitoring(unittest.TestCase):
         test4 = mownitoring.check_notifier(["syslog", "nonexistent"])
         self.assertEqual(test4, [mownitoring.notify_syslog])
 
+    @patch('subprocess.run')
+    def test_check_nrpe(self, mock_subprocess):
+        mownitoring.check_nrpe("disk1", "webserver.example.com", "5666")
+        mock_subprocess.assert_called_once_with(["/usr/local/libexec/" +
+                                                 "nagios/check_nrpe",
+                                                 "-Hwebserver.example.com",
+                                                 "-ccheck_disk1",
+                                                 "-p5666"],
+                                                stdout=-1,
+                                                universal_newlines=True)
+
     @patch('syslog.syslog')
     @patch('mownitoring.check_notifier')
     @patch('mownitoring.notify_syslog')
