@@ -47,7 +47,6 @@ class TestMownitoing(unittest.TestCase):
         test4 = mownitoring.check_notifier(["syslog", "nonexistent"])
         self.assertEqual(test4, [mownitoring.notify_syslog])
 
-
     @patch('syslog.syslog')
     @patch('mownitoring.check_notifier')
     @patch('mownitoring.notify_syslog')
@@ -59,7 +58,8 @@ class TestMownitoing(unittest.TestCase):
         mownitoring.check_alert("disk1", "webserver.example.com", "5666",
                                 "webserver.example.com", ["syslog"])
         mock_syslog.assert_called_once_with("webserver.example.com!" +
-                                                   "disk1 disk nok")
+                                            "disk1 disk nok")
+
 
 if __name__ == '__main__':
     unittest.main()
