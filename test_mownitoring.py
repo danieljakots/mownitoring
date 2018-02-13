@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import mownitoring
 
@@ -47,6 +47,19 @@ class TestMownitoing(unittest.TestCase):
         test4 = mownitoring.check_notifier(["syslog", "nonexistent"])
         self.assertEqual(test4, [mownitoring.notify_syslog])
 
+
+    @patch('syslog.syslog')
+    @patch('mownitoring.check_notifier')
+    @patch('mownitoring.notify_syslog')
+    def test_check_alert(self, mock_syslog, mock_check_notifier,
+                         mock_notify_syslog):
+        mownitoring.check_nrpe = Mock()
+        mownitoring.check_nrpe.return_value = 2, 'disk nok'
+        mock_check_notifier.return_value = [mownitoring.notify_syslog]
+        mownitoring.check_alert("disk1", "webserver.example.com", "5666",
+                                "webserver.example.com", ["syslog"])
+        mock_syslog.assert_called_once_with("webserver.example.com!" +
+                                                   "disk1 disk nok")
 
 if __name__ == '__main__':
     unittest.main()
