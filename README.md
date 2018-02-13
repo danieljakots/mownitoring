@@ -5,4 +5,5 @@
 
 # Status
 
-It's still a WIP, it doesn't run yet.
+It's still a WIP. It does run, but it doesn't have all the features
+that will make it nice to use.
