@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import unittest
+from unittest.mock import patch
+
 import mownitoring
 
 config_file = "./mownitoring.yml"
@@ -29,7 +31,8 @@ class TestMownitoing(unittest.TestCase):
         self.assertNotIn("token", machines)
         self.assertNotIn("Pushover", machines)
 
-    def test_check_notifier(self):
+    @patch('syslog.syslog')
+    def test_check_notifier(self, MockSyslog):
         test1 = mownitoring.check_notifier(["syslog"])
         self.assertIsInstance(test1, list)
         self.assertEqual(test1[0], mownitoring.notify_syslog)
