@@ -32,7 +32,7 @@ class TestMownitoing(unittest.TestCase):
         self.assertNotIn("Pushover", machines)
 
     @patch('syslog.syslog')
-    def test_check_notifier(self, MockSyslog):
+    def test_check_notifier(self, mock_syslog):
         test1 = mownitoring.check_notifier(["syslog"])
         self.assertIsInstance(test1, list)
         self.assertEqual(test1[0], mownitoring.notify_syslog)
