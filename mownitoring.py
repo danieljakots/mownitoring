@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+import smtplib
+import email.mime.text
+
 import subprocess
 import syslog
 
@@ -23,6 +26,24 @@ def notify_syslog(alert):
     syslog.syslog(syslog.LOG_WARNING, alert)
 
 
+def notify_mail(alert):
+    body = (
+        "Hi,\n",
+        "We detected a problem:\n",
+        alert,
+        "Yours truly,\n",
+        "Mownitoring"
+    )
+    msg = email.mime.text.MIMEText(str(body))
+    msg['Subject'] = "Alert from mownitoring"
+    msg['From'] = api_cfg["mail_from"]
+    msg['To'] = api_cfg["mail_to"]
+    s = smtplib.SMTP(api_cfg["mail_server"])
+    s.send_message(msg)
+    s.quit()
+    syslog.syslog("Alert sent through email")
+
+
 def check_nrpe(check, host, port):
     """Run a given check for a specified host."""
     nrpe = subprocess.run(["/usr/local/libexec/nagios/check_nrpe",
@@ -36,7 +57,8 @@ def check_nrpe(check, host, port):
 
 def check_notifier(notifiers):
     notifiers_available = {"syslog": notify_syslog,
-                           "pushover": notify_pushover}
+                           "pushover": notify_pushover,
+                           "mail": notify_mail}
     notifiers_valid = []
     for notifier in notifiers:
         try:
@@ -80,10 +102,16 @@ def read_conf(config_file):
             "pushover_user":
             yaml_cfg["Alerting_credentials"][0]["Pushover"]["user"],
             "pushover_api_url":
-            yaml_cfg["Alerting_credentials"][0]["Pushover"]["api_url"]
+            yaml_cfg["Alerting_credentials"][0]["Pushover"]["api_url"],
+            "mail_from":
+            yaml_cfg["Alerting_credentials"][1]["Mail"]["from"],
+            "mail_to":
+            yaml_cfg["Alerting_credentials"][1]["Mail"]["to"],
+            "mail_server":
+            yaml_cfg["Alerting_credentials"][1]["Mail"]["server"]
             }
     except KeyError:
-        syslog.syslog(syslog.LOG_ERR, "Pushover config couldn't be parsed")
+        syslog.syslog(syslog.LOG_ERR, "Alerting_cred couldn't be parsed")
 
     # monitored machines
     machines = yaml_cfg.copy()

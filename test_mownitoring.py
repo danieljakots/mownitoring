@@ -16,6 +16,8 @@ class TestMownitoring(unittest.TestCase):
         # api_cfg
         self.assertEqual(mownitoring.api_cfg["pushover_token"],
                          "T0k3n")
+        self.assertEqual(mownitoring.api_cfg["mail_server"],
+                         "localhost")
 
         # machines
         self.assertIsInstance(machines["webserver.example.com"][0]["checks"],
@@ -70,6 +72,21 @@ class TestMownitoring(unittest.TestCase):
                                  "webserver.example.com", ["syslog"])
         mock_syslog.assert_called_once_with("webserver.example.com!" +
                                             "disk1 disk nok")
+
+    @patch('smtplib.SMTP')
+    @patch('email.mime.text.MIMEText')
+    def test_notify_mail(self, mock_mimetext, mock_smtp):
+        # we need api_cfg
+        mownitoring.read_conf(config_file)
+        test_body = (
+            "Hi,\n",
+            "We detected a problem:\n",
+            "webserver.example.com!disk1 disk nok",
+            "Yours truly,\n",
+            "Mownitoring"
+        )
+        mownitoring.notify_mail("webserver.example.com!disk1 disk nok")
+        mock_mimetext.assert_called_once_with(str(test_body))
 
 
 if __name__ == '__main__':

@@ -50,3 +50,7 @@ Alerting_credentials:
       user: "johndoe"
       active: "True"
       api_url: "https://api.pushover.net/1/messages.json"
+  - Mail:
+      from: "monitoring@example.com"
+      to: "admin@example.com"
+      server: "localhost"
