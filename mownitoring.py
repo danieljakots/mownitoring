@@ -23,10 +23,12 @@ def notify_pushover(alert):
 
 
 def notify_syslog(alert):
+    """Notify through syslog."""
     syslog.syslog(syslog.LOG_WARNING, alert)
 
 
 def notify_mail(alert):
+    """Notify through email."""
     body = (
         "Hi,\n",
         "We detected a problem:\n",
@@ -56,6 +58,7 @@ def check_nrpe(check, host, port):
 
 
 def check_notifier(notifiers):
+    """Check the configured notifier really exists."""
     notifiers_available = {"syslog": notify_syslog,
                            "pushover": notify_pushover,
                            "mail": notify_mail}
