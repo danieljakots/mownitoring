@@ -13,7 +13,7 @@ CONFIG_FILE = "/etc/mownitoring.yml"
 
 
 def notify_pushover(alert):
-    """Send a pushover notification."""
+    """Notify through Pushover."""
     payload = {"token": api_cfg["pushover_token"],
                "user": api_cfg["pushover_user"],
                "message": alert}
