@@ -5,6 +5,7 @@ import email.mime.text
 
 import subprocess
 import syslog
+import datetime
 
 import requests
 import yaml
@@ -12,8 +13,9 @@ import yaml
 CONFIG_FILE = "/etc/mownitoring.yml"
 
 
-def notify_pushover(alert):
+def notify_pushover(machine, check, message, time_check):
     """Notify through Pushover."""
+    alert = time_check + ": " + machine + "!" + check + " " + message
     payload = {"token": api_cfg["pushover_token"],
                "user": api_cfg["pushover_user"],
                "message": alert}
@@ -22,22 +24,24 @@ def notify_pushover(alert):
     syslog.syslog("Alert sent through pushover")
 
 
-def notify_syslog(alert):
+def notify_syslog(machine, check, message, time_check):
     """Notify through syslog."""
+    alert = time_check + ": " + machine + "!" + check + " " + message
     syslog.syslog(syslog.LOG_WARNING, alert)
 
 
-def notify_mail(alert):
+def notify_mail(machine, check, message, time_check):
     """Notify through email."""
     body = (
-        "Hi,\n",
-        "We detected a problem:\n",
-        alert,
-        "Yours truly,\n",
+        "Hi,\n"
+        "On " + time_check + ", we detected a problem on "
+        "" + machine + " for the check " + check + ":\n\n"
+        "" + message + "\n\n"
+        "Yours truly,-- \n"
         "Mownitoring"
     )
     msg = email.mime.text.MIMEText(str(body))
-    msg['Subject'] = "Alert from mownitoring"
+    msg['Subject'] = "Alert from mownitoring: " + machine + "!" + check
     msg['From'] = api_cfg["mail_from"]
     msg['To'] = api_cfg["mail_to"]
     s = smtplib.SMTP(api_cfg["mail_server"])
@@ -74,12 +78,14 @@ def check_notifier(notifiers):
 
 def check_status(check, host, port, machine, notifiers):
     """Check the status of the check, and alert if needed."""
+    now = datetime.datetime.now()
     status, message = check_nrpe(check, host, port)
     if status != 0:
         notifiers_valid = check_notifier(notifiers)
         if notifiers_valid:
             for notifier in notifiers_valid:
-                notifier(machine + "!" + check + " " + message)
+                time_check = now.strftime('%Y/%m/%d %H:%M')
+                notifier(machine, check, message, time_check)
         else:
             syslog.syslog(syslog.LOG_ERR, "No valid notify system")
 

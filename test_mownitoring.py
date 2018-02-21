@@ -3,9 +3,18 @@
 import unittest
 from unittest.mock import Mock, patch
 
+import datetime
+
 import mownitoring
 
 config_file = "./mownitoring.yml"
+
+
+# Mock datetime.datetime
+class NewDate(datetime.datetime):
+    @classmethod
+    def now(cls):
+        return cls(1970, 1, 1, 9, 0, 0, 0)
 
 
 class TestMownitoring(unittest.TestCase):
@@ -67,11 +76,13 @@ class TestMownitoring(unittest.TestCase):
                           mock_notify_syslog):
         mownitoring.check_nrpe = Mock()
         mownitoring.check_nrpe.return_value = 2, 'disk nok'
+        # mock datetime.datetime
+        datetime.datetime = NewDate
         mock_check_notifier.return_value = [mownitoring.notify_syslog]
         mownitoring.check_status("disk1", "webserver.example.com", "5666",
                                  "webserver.example.com", ["syslog"])
-        mock_syslog.assert_called_once_with("webserver.example.com!" +
-                                            "disk1 disk nok")
+        mock_syslog.assert_called_once_with("webserver.example.com", "disk1",
+                                            "disk nok", "1970/01/01 09:00")
 
     @patch('smtplib.SMTP')
     @patch('email.mime.text.MIMEText')
@@ -79,13 +90,15 @@ class TestMownitoring(unittest.TestCase):
         # we need api_cfg
         mownitoring.read_conf(config_file)
         test_body = (
-            "Hi,\n",
-            "We detected a problem:\n",
-            "webserver.example.com!disk1 disk nok",
-            "Yours truly,\n",
+            "Hi,\n"
+            "On 1970/01/01 09:00, we detected a problem on "
+            "webserver.example.com for the check disk1:\n\n"
+            "disk nok\n\n"
+            "Yours truly,-- \n"
             "Mownitoring"
         )
-        mownitoring.notify_mail("webserver.example.com!disk1 disk nok")
+        mownitoring.notify_mail("webserver.example.com", "disk1", "disk nok",
+                                "1970/01/01 09:00")
         mock_mimetext.assert_called_once_with(str(test_body))
 
 
