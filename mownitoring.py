@@ -18,7 +18,11 @@ def notify_pushover(machine, check, message, time_check):
     alert = time_check + ": " + machine + "!" + check + " " + message
     payload = {"token": api_cfg["pushover_token"],
                "user": api_cfg["pushover_user"],
-               "message": alert}
+               "message": alert,
+               "priority": "2",
+               "expire": "3600",
+               "retry": "90",
+               "title": "Alert from mownitoring: " + machine + "!" + check}
 
     requests.post(api_cfg["pushover_api_url"], params=payload)
     syslog.syslog("Alert sent through pushover")
