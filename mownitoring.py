@@ -24,8 +24,11 @@ def notify_pushover(machine, check, message, time_check):
                "retry": "90",
                "title": "Alert from mownitoring: " + machine + "!" + check}
 
-    requests.post(api_cfg["pushover_api_url"], params=payload)
-    syslog.syslog("Alert sent through pushover")
+    p = requests.post(api_cfg["pushover_api_url"], params=payload)
+    if p.status_code == 200:
+        syslog.syslog("Alert sent through pushover")
+    else:
+        syslog.syslog(syslog.LOG_ERR, "Sending through pushover didn't work")
 
 
 def notify_syslog(machine, check, message, time_check):
