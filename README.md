@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/danieljakots/mownitoring.svg?branch=master)](https://travis-ci.org/danieljakots/mownitoring)
+
 # Mownitoring
 
 'My own monitoring'. Which is also a mix between 'monitoring',
