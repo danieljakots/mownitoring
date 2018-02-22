@@ -21,7 +21,7 @@ def notify_pushover(machine, check, message, time_check):
     payload = {"token": api_cfg["pushover_token"],
                "user": api_cfg["pushover_user"],
                "message": alert,
-               "priority": "2",
+               "priority": "1",
                "expire": "3600",
                "retry": "90",
                "title": "Alert from mownitoring: " + machine + "!" + check}
