@@ -4,6 +4,7 @@ import unittest
 from unittest.mock import Mock, patch
 
 import datetime
+import sqlite3
 
 import mownitoring
 
@@ -72,17 +73,41 @@ class TestMownitoring(unittest.TestCase):
     @patch('syslog.syslog')
     @patch('mownitoring.check_notifier')
     @patch('mownitoring.notify_syslog')
-    def test_check_status(self, mock_syslog, mock_check_notifier,
-                          mock_notify_syslog):
+    def test_check_status1(self, mock_notify_syslog1, mock_check_notifier,
+                           mock_syslog1):
+        mownitoring.sqlite_init(':memory:')
         mownitoring.check_nrpe = Mock()
         mownitoring.check_nrpe.return_value = 2, 'disk nok'
         # mock datetime.datetime
         datetime.datetime = NewDate
         mock_check_notifier.return_value = [mownitoring.notify_syslog]
+        conn = mownitoring.sqlite_init(":memory:")
         mownitoring.check_status("disk1", "webserver.example.com", "5666",
-                                 "webserver.example.com", ["syslog"])
-        mock_syslog.assert_called_once_with("webserver.example.com", "disk1",
-                                            "disk nok", "1970/01/01 09:00")
+                                 "webserver.example.com", ["syslog"], conn)
+        mock_notify_syslog1.assert_called_once_with("webserver.example.com",
+                                                    "disk1", "disk nok",
+                                                    "1970/01/01 09:00")
+        conn.close()
+
+    @patch('syslog.syslog')
+    @patch('mownitoring.check_notifier')
+    @patch('mownitoring.notify_pushover')
+    def test_check_status2(self, mock_notify_pushover, mock_check_notifier,
+                           mock_syslog):
+        mownitoring.sqlite_init(':memory:')
+        mownitoring.check_nrpe = Mock()
+        mownitoring.check_nrpe.return_value = 2, 'disk nok'
+        # mock datetime.datetime
+        datetime.datetime = NewDate
+        mock_check_notifier.return_value = [mock_notify_pushover]
+        conn = mownitoring.sqlite_init(":memory:")
+        c = conn.cursor()
+        c.execute("INSERT INTO mownitoring VALUES ('db.example.com', " +
+                  "'disk1', 2, 1519300000)")
+        mownitoring.check_status("disk1", "db.example.com", "5667",
+                                 "db.example.com", ["pushover"], conn)
+        mock_notify_pushover.assert_not_called()
+        conn.close()
 
     @patch('smtplib.SMTP')
     @patch('email.mime.text.MIMEText')
@@ -91,7 +116,7 @@ class TestMownitoring(unittest.TestCase):
         mownitoring.read_conf(config_file)
         test_body = (
             "Hi,\n"
-            "On 1970/01/01 09:00, we detected a problem on "
+            "On 1970/01/01 09:00, we detected a change on "
             "webserver.example.com for the check disk1:\n\n"
             "disk nok\n\n"
             "Yours truly,-- \n"
@@ -100,6 +125,10 @@ class TestMownitoring(unittest.TestCase):
         mownitoring.notify_mail("webserver.example.com", "disk1", "disk nok",
                                 "1970/01/01 09:00")
         mock_mimetext.assert_called_once_with(str(test_body))
+
+    def test_sqlite_init(self):
+        conn = mownitoring.sqlite_init(":memory:")
+        self.assertIsInstance(conn, sqlite3.Connection)
 
 
 if __name__ == '__main__':

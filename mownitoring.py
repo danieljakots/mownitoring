@@ -3,6 +3,7 @@
 import smtplib
 import email.mime.text
 
+import sqlite3
 import subprocess
 import syslog
 import datetime
@@ -11,6 +12,7 @@ import requests
 import yaml
 
 CONFIG_FILE = "/etc/mownitoring.yml"
+SQLITE_FILE = "/tmp/mownitoring.sqlite"
 
 
 def notify_pushover(machine, check, message, time_check):
@@ -41,7 +43,7 @@ def notify_mail(machine, check, message, time_check):
     """Notify through email."""
     body = (
         "Hi,\n"
-        "On " + time_check + ", we detected a problem on "
+        "On " + time_check + ", we detected a change on "
         "" + machine + " for the check " + check + ":\n\n"
         "" + message + "\n\n"
         "Yours truly,\n-- \n"
@@ -83,18 +85,47 @@ def check_notifier(notifiers):
     return notifiers_valid
 
 
-def check_status(check, host, port, machine, notifiers):
-    """Check the status of the check, and alert if needed."""
-    now = datetime.datetime.now()
+def notify(check, message, machine, notifiers, timestamp):
+    """Send an alert to notification system(s)."""
+    notifiers_valid = check_notifier(notifiers)
+    if notifiers_valid:
+        for notifier in notifiers_valid:
+            time_check = timestamp.strftime('%Y/%m/%d %H:%M')
+            notifier(machine, check, message, time_check)
+    else:
+        syslog.syslog(syslog.LOG_ERR, "No valid notify system")
+
+
+def check_status(check, host, port, machine, notifiers, conn):
+    """Choose if we send an alert."""
+    timestamp = datetime.datetime.now()
     status, message = check_nrpe(check, host, port)
-    if status != 0:
-        notifiers_valid = check_notifier(notifiers)
-        if notifiers_valid:
-            for notifier in notifiers_valid:
-                time_check = now.strftime('%Y/%m/%d %H:%M')
-                notifier(machine, check, message, time_check)
+    c = conn.cursor()
+    param = (machine, check)
+    try:
+        c.execute('SELECT status FROM mownitoring ' +
+                  'WHERE machine=? AND check_name=?', param)
+    except sqlite3.OperationalError:
+        pass
+    logged_status = c.fetchone()
+    if logged_status:
+        if logged_status[0] != status:
+            notify(check, message, machine, notifiers, timestamp)
         else:
-            syslog.syslog(syslog.LOG_ERR, "No valid notify system")
+            if logged_status[0] != 0:
+                alert = ("Already known state but still a problem for " +
+                         machine + "!" + check)
+                syslog.syslog(alert)
+        if status == 0:
+            param = (machine, check)
+            c.execute('DELETE FROM mownitoring ' +
+                      'WHERE machine=? AND check_name=?', param)
+    else:
+        if status != 0:
+            param = (machine, check, status, timestamp.strftime('%s'))
+            c.execute("INSERT INTO mownitoring VALUES (?, ?, ?, ?)", param)
+            notify(check, message, machine, notifiers, timestamp)
+    conn.commit()
 
 
 def read_conf(config_file):
@@ -136,9 +167,20 @@ def read_conf(config_file):
     return machines
 
 
+def sqlite_init(sqlite_file):
+    """Initialize database."""
+    conn = sqlite3.connect(sqlite_file)
+    c = conn.cursor()
+    c.execute('CREATE TABLE IF NOT EXISTS mownitoring (machine TEXT, ' +
+              'check_name TEXT, status INTEGER, mtime INTEGER);')
+    conn.commit()
+    return conn
+
+
 if __name__ == "__main__":
     syslog.syslog("mownitoring starts")
     machines = read_conf(CONFIG_FILE)
+    conn = sqlite_init(SQLITE_FILE)
     for machine in machines["machines"]:
         for check in machines[machine][0]["checks"]:
             try:
@@ -148,5 +190,6 @@ if __name__ == "__main__":
                 host = machine
                 port = "5666"
             check_status(check, host, port, machine,
-                         machines[machine][1]["alert"])
+                         machines[machine][1]["alert"], conn)
+    conn.commit()
     syslog.syslog("mownitoring ends")
