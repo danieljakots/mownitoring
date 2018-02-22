@@ -3,7 +3,31 @@
 'My own monitoring'. Which is also a mix between 'monitoring',
 'chown.me' (the domain I rent) and it kinda sounds like 'moan'.
 
-# Status
+# Usage
 
-It's still a WIP. It does run, but it doesn't have all the features
-that will make it nice to use.
+Copy `mownitoring.yml` in `/etc/` and configures your machines and
+their checks. Add the script in your crontab(1) if it suits your need.
+
+# FAQ
+
+## What is the use case?
+
+I don't have many machine to monitor nor I want a complex monitoring
+system. It just runs checks and sends notification if needed. Nothing
+more.
+
+## How does it work?
+
+It parses the configuration and then for each services of each host,
+the script calls check_nrpe to get the return code and the message. If
+the return code is not 0 it sends a notification and stores the return
+code in a sqlite database. If the return code is different than the
+one stored, it sends a notification.
+
+## How do I 'acknoledge' an alert?
+
+You don't. You only get a notification if the service status changes.
+
+## Can I have pretty graphs?
+
+Nope.
