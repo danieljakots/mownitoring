@@ -119,7 +119,7 @@ class TestMownitoring(unittest.TestCase):
             "On 1970/01/01 09:00, we detected a change on "
             "webserver.example.com for the check disk1:\n\n"
             "disk nok\n\n"
-            "Yours truly,-- \n"
+            "Yours truly,\n-- \n"
             "Mownitoring"
         )
         mownitoring.notify_mail("webserver.example.com", "disk1", "disk nok",
