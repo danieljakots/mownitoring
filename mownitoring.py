@@ -62,6 +62,7 @@ def notify_mail(machine, check, message, time_check):
 def check_nrpe(check, host, port):
     """Run a given check for a specified host."""
     nrpe = subprocess.run(["/usr/local/libexec/nagios/check_nrpe",
+                           "-t30",
                            "-H" + host,
                            "-ccheck_" + check,
                            "-p" + port],

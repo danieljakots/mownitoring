@@ -64,6 +64,7 @@ class TestMownitoring(unittest.TestCase):
         mownitoring.check_nrpe("disk1", "webserver.example.com", "5666")
         mock_subprocess.assert_called_once_with(["/usr/local/libexec/" +
                                                  "nagios/check_nrpe",
+                                                 "-t30",
                                                  "-Hwebserver.example.com",
                                                  "-ccheck_disk1",
                                                  "-p5666"],
