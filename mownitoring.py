@@ -11,6 +11,7 @@ import datetime
 import requests
 import yaml
 
+CHECKNRPE_BIN = "/usr/local/libexec/nagios/check_nrpe"
 CONFIG_FILE = "/etc/mownitoring.yml"
 SQLITE_FILE = "/tmp/mownitoring.sqlite"
 
@@ -61,7 +62,7 @@ def notify_mail(machine, check, message, time_check):
 
 def check_nrpe(check, host, port):
     """Run a given check for a specified host."""
-    nrpe = subprocess.run(["/usr/local/libexec/nagios/check_nrpe",
+    nrpe = subprocess.run([CHECKNRPE_BIN,
                            "-t30",
                            "-H" + host,
                            "-ccheck_" + check,
