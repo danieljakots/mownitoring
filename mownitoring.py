@@ -44,7 +44,7 @@ def notify_mail(machine, check, message, time_check):
         "On " + time_check + ", we detected a problem on "
         "" + machine + " for the check " + check + ":\n\n"
         "" + message + "\n\n"
-        "Yours truly,-- \n"
+        "Yours truly,\n-- \n"
         "Mownitoring"
     )
     msg = email.mime.text.MIMEText(str(body))
