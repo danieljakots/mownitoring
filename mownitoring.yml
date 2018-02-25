@@ -1,3 +1,4 @@
+---
 machines:
   - webserver.example.com
   - db.example.com
