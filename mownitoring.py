@@ -147,17 +147,17 @@ def read_conf(config_file):
     try:
         api_cfg = {
             "pushover_token":
-            yaml_cfg["Alerting_credentials"][0]["Pushover"]["token"],
+            yaml_cfg["Alerting_credentials"]["Pushover"]["token"],
             "pushover_user":
-            yaml_cfg["Alerting_credentials"][0]["Pushover"]["user"],
+            yaml_cfg["Alerting_credentials"]["Pushover"]["user"],
             "pushover_api_url":
-            yaml_cfg["Alerting_credentials"][0]["Pushover"]["api_url"],
+            yaml_cfg["Alerting_credentials"]["Pushover"]["api_url"],
             "mail_from":
-            yaml_cfg["Alerting_credentials"][1]["Mail"]["from"],
+            yaml_cfg["Alerting_credentials"]["Mail"]["from"],
             "mail_to":
-            yaml_cfg["Alerting_credentials"][1]["Mail"]["to"],
+            yaml_cfg["Alerting_credentials"]["Mail"]["to"],
             "mail_server":
-            yaml_cfg["Alerting_credentials"][1]["Mail"]["server"]
+            yaml_cfg["Alerting_credentials"]["Mail"]["server"]
             }
     except KeyError:
         syslog.syslog(syslog.LOG_ERR, "Alerting_cred couldn't be parsed")

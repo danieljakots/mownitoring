@@ -46,12 +46,12 @@ mail.example.com:
 
 
 Alerting_credentials:
-  - Pushover:
-      token: "T0k3n"
-      user: "johndoe"
-      active: "True"
-      api_url: "https://api.pushover.net/1/messages.json"
-  - Mail:
-      from: "monitoring@example.com"
-      to: "admin@example.com"
-      server: "localhost"
+  Pushover:
+    token: "T0k3n"
+    user: "johndoe"
+    active: "True"
+    api_url: "https://api.pushover.net/1/messages.json"
+  Mail:
+    from: "monitoring@example.com"
+    to: "admin@example.com"
+    server: "localhost"
