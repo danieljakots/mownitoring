@@ -159,21 +159,35 @@ def read_conf(config_file):
 
     global api_cfg
     api_cfg = {}
-    # pushover
+
     try:
-        api_cfg = {
+        pushover = {
             "pushover_token":
             yaml_cfg["Alerting_credentials"]["Pushover"]["token"],
             "pushover_user":
             yaml_cfg["Alerting_credentials"]["Pushover"]["user"],
             "pushover_api_url":
-            yaml_cfg["Alerting_credentials"]["Pushover"]["api_url"],
+            yaml_cfg["Alerting_credentials"]["Pushover"]["api_url"]
+            }
+        api_cfg.update(pushover)
+    except KeyError:
+        syslog.syslog(syslog.LOG_ERR, "Pushover config is wrong or missing")
+
+    try:
+        mail = {
             "mail_from":
             yaml_cfg["Alerting_credentials"]["Mail"]["from"],
             "mail_to":
             yaml_cfg["Alerting_credentials"]["Mail"]["to"],
             "mail_server":
-            yaml_cfg["Alerting_credentials"]["Mail"]["server"],
+            yaml_cfg["Alerting_credentials"]["Mail"]["server"]
+            }
+        api_cfg.update(mail)
+    except KeyError:
+        syslog.syslog(syslog.LOG_ERR, "Mail config is wrong or missing")
+
+    try:
+        twilio = {
             "twilio_account_sid":
             yaml_cfg["Alerting_credentials"]["Twilio"]["account_sid"],
             "twilio_auth_token":
@@ -183,10 +197,11 @@ def read_conf(config_file):
             "twilio_dest":
             yaml_cfg["Alerting_credentials"]["Twilio"]["dest"],
             "twilio_api_url":
-            yaml_cfg["Alerting_credentials"]["Twilio"]["api_url"],
+            yaml_cfg["Alerting_credentials"]["Twilio"]["api_url"]
             }
+        api_cfg.update(twilio)
     except KeyError:
-        syslog.syslog(syslog.LOG_ERR, "Alerting_cred couldn't be parsed")
+        syslog.syslog(syslog.LOG_ERR, "Twilio config is wrong or missing")
 
     # monitored machines
     machines = yaml_cfg.copy()
