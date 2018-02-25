@@ -28,6 +28,8 @@ class TestMownitoring(unittest.TestCase):
                          "T0k3n")
         self.assertEqual(mownitoring.api_cfg["mail_server"],
                          "localhost")
+        self.assertEqual(mownitoring.api_cfg["twilio_account_sid"],
+                         "11235811")
 
         # machines
         self.assertIsInstance(machines["webserver.example.com"][0]["checks"],

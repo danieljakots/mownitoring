@@ -60,6 +60,21 @@ def notify_mail(machine, check, message, time_check):
     syslog.syslog("Alert sent through email")
 
 
+def notify_twilio(alert, ):
+    """Send a text with twilio."""
+    payload = {'From': api_cfg["twilio_available_number"],
+               'To': "+" + api_cfg["twilio_dest"],
+               'Body': alert}
+    # send the text with twilio's api
+    p = requests.post(api_cfg["twilio_api_url"],
+                      data=payload,
+                      auth=(api_cfg["twilio_account_sid"],
+                            api_cfg["twilio_auth_token"]))
+    if p.status_code != 201:
+        syslog.syslog(syslog.LOG_ERR, 'Problem while sending twilio')
+    syslog.syslog('SMS sent with twilio to ' + api_cfg["twilio_dest"])
+
+
 def check_nrpe(check, host, port):
     """Run a given check for a specified host."""
     nrpe = subprocess.run([CHECKNRPE_BIN,
@@ -76,7 +91,8 @@ def check_notifier(notifiers):
     """Check the configured notifier really exists."""
     notifiers_available = {"syslog": notify_syslog,
                            "pushover": notify_pushover,
-                           "mail": notify_mail}
+                           "mail": notify_mail,
+                           "twilio": notify_twilio}
     notifiers_valid = []
     for notifier in notifiers:
         try:
@@ -157,7 +173,17 @@ def read_conf(config_file):
             "mail_to":
             yaml_cfg["Alerting_credentials"]["Mail"]["to"],
             "mail_server":
-            yaml_cfg["Alerting_credentials"]["Mail"]["server"]
+            yaml_cfg["Alerting_credentials"]["Mail"]["server"],
+            "twilio_account_sid":
+            yaml_cfg["Alerting_credentials"]["Twilio"]["account_sid"],
+            "twilio_auth_token":
+            yaml_cfg["Alerting_credentials"]["Twilio"]["auth_token"],
+            "twilio_sender":
+            yaml_cfg["Alerting_credentials"]["Twilio"]["sender"],
+            "twilio_dest":
+            yaml_cfg["Alerting_credentials"]["Twilio"]["dest"],
+            "twilio_api_url":
+            yaml_cfg["Alerting_credentials"]["Twilio"]["api_url"],
             }
     except KeyError:
         syslog.syslog(syslog.LOG_ERR, "Alerting_cred couldn't be parsed")
