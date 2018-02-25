@@ -26,6 +26,12 @@ the return code is not 0 it sends a notification and stores the return
 code in a sqlite database. If the return code is different than the
 one stored, it sends a notification.
 
+## What are the supported notification systems?
+
+* [Pushover](https://pushover.net/)
+* email
+* [Twilio](https://www.twilio.com/)
+
 ## How do I 'acknowledge' an alert?
 
 You don't. You only get a notification if the service status changes.
