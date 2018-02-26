@@ -73,7 +73,7 @@ def craft_sms(machine, check, message, time_check):
 def notify_twilio(machine, check, message, time_check):
     """Send a text with twilio."""
     alert = craft_sms(machine, check, message, time_check)
-    payload = {'From': api_cfg["twilio_available_number"],
+    payload = {'From': api_cfg["twilio_sender"],
                'To': "+" + api_cfg["twilio_dest"],
                'Body': alert}
     # send the text with twilio's api
