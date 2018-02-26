@@ -60,8 +60,19 @@ def notify_mail(machine, check, message, time_check):
     syslog.syslog("Alert sent through email")
 
 
-def notify_twilio(alert, ):
+def craft_sms(machine, check, message, time_check):
+    """Create a valuable alert with less text."""
+    # keep just the hour, i.e. strip de year/month/day
+    time_check = time_check[-5:]
+    # remove the domain
+    machine = machine.split('.')[0]
+    alert = time_check + " " + machine + "!" + check + " " + message
+    return alert[0:156]
+
+
+def notify_twilio(machine, check, message, time_check):
     """Send a text with twilio."""
+    alert = craft_sms(machine, check, message, time_check)
     payload = {'From': api_cfg["twilio_available_number"],
                'To': "+" + api_cfg["twilio_dest"],
                'Body': alert}

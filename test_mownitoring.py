@@ -133,6 +133,21 @@ class TestMownitoring(unittest.TestCase):
         conn = mownitoring.sqlite_init(":memory:")
         self.assertIsInstance(conn, sqlite3.Connection)
 
+    def test_craft_sms(self):
+        message = (
+                "disk very very full, like totally blahblah full partition, "
+                "blahblah other fullpartition, blahblah third partition "
+                "completely full, oh and inodes are full too btw"
+                )
+        reallyis = mownitoring.craft_sms("webserver.example.com", "disk1",
+                                         message, "1970/01/01 09:00")
+        shouldbe = (
+                "09:00 webserver!disk1 disk very very full, like totally "
+                "blahblah full partition, blahblah other fullpartition, "
+                "blahblah third partition completely full, oh "
+                )
+        self.assertEqual(reallyis, shouldbe)
+
 
 if __name__ == '__main__':
     unittest.main()
