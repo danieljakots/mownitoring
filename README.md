@@ -12,6 +12,10 @@ their checks. Add the script in your crontab(1) if it suits your need.
 
 # FAQ
 
+## What are the requirements?
+
+Python 3.6, requests and yaml.
+
 ## What is the use case?
 
 I don't have many machines to monitor nor I want a complex monitoring
