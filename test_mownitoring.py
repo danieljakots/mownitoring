@@ -19,17 +19,13 @@ class NewDate(datetime.datetime):
 
 
 class TestMownitoring(unittest.TestCase):
-
     def test_readconf(self):
         machines = mownitoring.read_conf(config_file)
 
         # api_cfg
-        self.assertEqual(mownitoring.api_cfg["pushover_token"],
-                         "T0k3n")
-        self.assertEqual(mownitoring.api_cfg["mail_server"],
-                         "localhost")
-        self.assertEqual(mownitoring.api_cfg["twilio_account_sid"],
-                         "11235811")
+        self.assertEqual(mownitoring.api_cfg["pushover_token"], "T0k3n")
+        self.assertEqual(mownitoring.api_cfg["mail_server"], "localhost")
+        self.assertEqual(mownitoring.api_cfg["twilio_account_sid"], "11235811")
 
         # machines
         self.assertIsInstance(machines["webserver.example.com"][0]["checks"],
@@ -64,14 +60,13 @@ class TestMownitoring(unittest.TestCase):
     @patch('subprocess.run')
     def test_check_nrpe(self, mock_subprocess):
         mownitoring.check_nrpe("disk1", "webserver.example.com", "5666")
-        mock_subprocess.assert_called_once_with(["/usr/local/libexec/" +
-                                                 "nagios/check_nrpe",
-                                                 "-t30",
-                                                 "-Hwebserver.example.com",
-                                                 "-ccheck_disk1",
-                                                 "-p5666"],
-                                                stdout=-1,
-                                                universal_newlines=True)
+        mock_subprocess.assert_called_once_with(
+            [
+                "/usr/local/libexec/" + "nagios/check_nrpe", "-t30",
+                "-Hwebserver.example.com", "-ccheck_disk1", "-p5666"
+            ],
+            stdout=-1,
+            universal_newlines=True)
 
     @patch('syslog.syslog')
     @patch('mownitoring.check_notifier')
@@ -87,9 +82,8 @@ class TestMownitoring(unittest.TestCase):
         conn = mownitoring.sqlite_init(":memory:")
         mownitoring.check_status("disk1", "webserver.example.com", "5666",
                                  "webserver.example.com", ["syslog"], conn)
-        mock_notify_syslog1.assert_called_once_with("webserver.example.com",
-                                                    "disk1", "disk nok",
-                                                    "1970/01/01 09:00")
+        mock_notify_syslog1.assert_called_once_with(
+            "webserver.example.com", "disk1", "disk nok", "1970/01/01 09:00")
         conn.close()
 
     @patch('syslog.syslog')
@@ -117,14 +111,12 @@ class TestMownitoring(unittest.TestCase):
     def test_notify_mail(self, mock_mimetext, mock_smtp):
         # we need api_cfg
         mownitoring.read_conf(config_file)
-        test_body = (
-            "Hi,\n"
-            "On 1970/01/01 09:00, we detected a change on "
-            "webserver.example.com for the check disk1:\n\n"
-            "disk nok\n\n"
-            "Yours truly,\n-- \n"
-            "Mownitoring"
-        )
+        test_body = ("Hi,\n"
+                     "On 1970/01/01 09:00, we detected a change on "
+                     "webserver.example.com for the check disk1:\n\n"
+                     "disk nok\n\n"
+                     "Yours truly,\n-- \n"
+                     "Mownitoring")
         mownitoring.notify_mail("webserver.example.com", "disk1", "disk nok",
                                 "1970/01/01 09:00")
         mock_mimetext.assert_called_once_with(str(test_body))
@@ -135,17 +127,14 @@ class TestMownitoring(unittest.TestCase):
 
     def test_craft_sms(self):
         message = (
-                "disk very very full, like totally blahblah full partition, "
-                "blahblah other fullpartition, blahblah third partition "
-                "completely full, oh and inodes are full too btw"
-                )
+            "disk very very full, like totally blahblah full partition, "
+            "blahblah other fullpartition, blahblah third partition "
+            "completely full, oh and inodes are full too btw")
         reallyis = mownitoring.craft_sms("webserver.example.com", "disk1",
                                          message, "1970/01/01 09:00")
-        shouldbe = (
-                "09:00 webserver!disk1 disk very very full, like totally "
-                "blahblah full partition, blahblah other fullpartition, "
-                "blahblah third partition completely full, oh "
-                )
+        shouldbe = ("09:00 webserver!disk1 disk very very full, like totally "
+                    "blahblah full partition, blahblah other fullpartition, "
+                    "blahblah third partition completely full, oh ")
         self.assertEqual(reallyis, shouldbe)
 
 

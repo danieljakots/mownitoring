@@ -19,13 +19,15 @@ SQLITE_FILE = "/tmp/mownitoring.sqlite"
 def notify_pushover(machine, check, message, time_check):
     """Notify through Pushover."""
     alert = time_check + ": " + machine + "!" + check + " " + message
-    payload = {"token": api_cfg["pushover_token"],
-               "user": api_cfg["pushover_user"],
-               "message": alert,
-               "priority": "1",
-               "expire": "3600",
-               "retry": "90",
-               "title": "Alert from mownitoring: " + machine + "!" + check}
+    payload = {
+        "token": api_cfg["pushover_token"],
+        "user": api_cfg["pushover_user"],
+        "message": alert,
+        "priority": "1",
+        "expire": "3600",
+        "retry": "90",
+        "title": "Alert from mownitoring: " + machine + "!" + check
+    }
 
     p = requests.post(api_cfg["pushover_api_url"], params=payload)
     if p.status_code == 200:
@@ -42,14 +44,12 @@ def notify_syslog(machine, check, message, time_check):
 
 def notify_mail(machine, check, message, time_check):
     """Notify through email."""
-    body = (
-        "Hi,\n"
-        "On " + time_check + ", we detected a change on "
-        "" + machine + " for the check " + check + ":\n\n"
-        "" + message + "\n\n"
-        "Yours truly,\n-- \n"
-        "Mownitoring"
-    )
+    body = ("Hi,\n"
+            "On " + time_check + ", we detected a change on "
+            "" + machine + " for the check " + check + ":\n\n"
+            "" + message + "\n\n"
+            "Yours truly,\n-- \n"
+            "Mownitoring")
     msg = email.mime.text.MIMEText(str(body))
     msg['Subject'] = "Alert from mownitoring: " + machine + "!" + check
     msg['From'] = api_cfg["mail_from"]
@@ -73,14 +73,16 @@ def craft_sms(machine, check, message, time_check):
 def notify_twilio(machine, check, message, time_check):
     """Send a text with twilio."""
     alert = craft_sms(machine, check, message, time_check)
-    payload = {'From': api_cfg["twilio_sender"],
-               'To': "+" + api_cfg["twilio_dest"],
-               'Body': alert}
+    payload = {
+        'From': api_cfg["twilio_sender"],
+        'To': "+" + api_cfg["twilio_dest"],
+        'Body': alert
+    }
     # send the text with twilio's api
-    p = requests.post(api_cfg["twilio_api_url"],
-                      data=payload,
-                      auth=(api_cfg["twilio_account_sid"],
-                            api_cfg["twilio_auth_token"]))
+    p = requests.post(
+        api_cfg["twilio_api_url"],
+        data=payload,
+        auth=(api_cfg["twilio_account_sid"], api_cfg["twilio_auth_token"]))
     if p.status_code != 201:
         syslog.syslog(syslog.LOG_ERR, 'Problem while sending twilio')
     syslog.syslog('SMS sent with twilio to ' + api_cfg["twilio_dest"])
@@ -88,29 +90,28 @@ def notify_twilio(machine, check, message, time_check):
 
 def check_nrpe(check, host, port):
     """Run a given check for a specified host."""
-    nrpe = subprocess.run([CHECKNRPE_BIN,
-                           "-t30",
-                           "-H" + host,
-                           "-ccheck_" + check,
-                           "-p" + port],
-                          stdout=subprocess.PIPE,
-                          universal_newlines=True)
+    nrpe = subprocess.run(
+        [CHECKNRPE_BIN, "-t30", "-H" + host, "-ccheck_" + check, "-p" + port],
+        stdout=subprocess.PIPE,
+        universal_newlines=True)
     return nrpe.returncode, nrpe.stdout
 
 
 def check_notifier(notifiers):
     """Check the configured notifier really exists."""
-    notifiers_available = {"syslog": notify_syslog,
-                           "pushover": notify_pushover,
-                           "mail": notify_mail,
-                           "twilio": notify_twilio}
+    notifiers_available = {
+        "syslog": notify_syslog,
+        "pushover": notify_pushover,
+        "mail": notify_mail,
+        "twilio": notify_twilio
+    }
     notifiers_valid = []
     for notifier in notifiers:
         try:
             notifiers_valid.append(notifiers_available[notifier])
         except KeyError:
-            syslog.syslog(syslog.LOG_ERR, "Unknown notifier " + notifier +
-                          " configured")
+            syslog.syslog(syslog.LOG_ERR,
+                          "Unknown notifier " + notifier + " configured")
     return notifiers_valid
 
 
@@ -179,20 +180,17 @@ def read_conf(config_file):
             yaml_cfg["Alerting_credentials"]["Pushover"]["user"],
             "pushover_api_url":
             yaml_cfg["Alerting_credentials"]["Pushover"]["api_url"]
-            }
+        }
         api_cfg.update(pushover)
     except KeyError:
         syslog.syslog(syslog.LOG_ERR, "Pushover config is wrong or missing")
 
     try:
         mail = {
-            "mail_from":
-            yaml_cfg["Alerting_credentials"]["Mail"]["from"],
-            "mail_to":
-            yaml_cfg["Alerting_credentials"]["Mail"]["to"],
-            "mail_server":
-            yaml_cfg["Alerting_credentials"]["Mail"]["server"]
-            }
+            "mail_from": yaml_cfg["Alerting_credentials"]["Mail"]["from"],
+            "mail_to": yaml_cfg["Alerting_credentials"]["Mail"]["to"],
+            "mail_server": yaml_cfg["Alerting_credentials"]["Mail"]["server"]
+        }
         api_cfg.update(mail)
     except KeyError:
         syslog.syslog(syslog.LOG_ERR, "Mail config is wrong or missing")
@@ -209,7 +207,7 @@ def read_conf(config_file):
             yaml_cfg["Alerting_credentials"]["Twilio"]["dest"],
             "twilio_api_url":
             yaml_cfg["Alerting_credentials"]["Twilio"]["api_url"]
-            }
+        }
         api_cfg.update(twilio)
     except KeyError:
         syslog.syslog(syslog.LOG_ERR, "Twilio config is wrong or missing")
