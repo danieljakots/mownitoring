@@ -222,10 +222,9 @@ def read_conf(config_file):
 def sqlite_init(sqlite_file):
     """Initialize database."""
     conn = sqlite3.connect(sqlite_file)
-    c = conn.cursor()
-    c.execute('CREATE TABLE IF NOT EXISTS mownitoring (machine TEXT, ' +
-              'check_name TEXT, status INTEGER, mtime INTEGER);')
-    conn.commit()
+    with conn:
+        conn.execute('CREATE TABLE IF NOT EXISTS mownitoring (machine TEXT, ' +
+                     'check_name TEXT, status INTEGER, mtime INTEGER);')
     return conn
 
 
