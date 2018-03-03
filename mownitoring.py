@@ -243,5 +243,5 @@ if __name__ == "__main__":
                 port = "5666"
             check_status(check, host, port, machine,
                          machines[machine][1]["alert"], conn)
-    conn.commit()
+    conn.close()
     syslog.syslog("mownitoring ends")
