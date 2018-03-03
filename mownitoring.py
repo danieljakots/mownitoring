@@ -62,7 +62,7 @@ def notify_mail(machine, check, message, time_check):
 
 def craft_sms(machine, check, message, time_check):
     """Create a valuable alert with less text."""
-    # keep just the hour, i.e. strip de year/month/day
+    # keep just the hour, i.e. strip year/month/day
     time_check = time_check[-5:]
     # remove the domain
     machine = machine.split('.')[0]
