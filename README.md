@@ -38,6 +38,9 @@ once*.
 * email
 * [Twilio](https://www.twilio.com/)
 
+It also logs what is happening (but that's not really a notification system
+per se).
+
 ## How do I 'acknowledge' an alert?
 
 You don't. You only get a notification if the service status changes.
