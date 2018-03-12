@@ -28,7 +28,7 @@ def notify_pushover(machine, check, message, time_check):
         "priority": "1",
         "expire": "3600",
         "retry": "90",
-        "title": "Alert from mownitoring: {machine}!{check}"
+        "title": f"Alert from mownitoring: {machine}!{check}"
     }
 
     p = requests.post(api_cfg["pushover_api_url"], params=payload)
