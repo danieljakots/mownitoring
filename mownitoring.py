@@ -20,7 +20,7 @@ SQLITE_FILE = "/tmp/mownitoring.sqlite"
 
 def notify_pushover(machine, check, message, time_check):
     """Notify through Pushover."""
-    alert = time_check + ": " + machine + "!" + check + " " + message
+    alert = f"{time_check}: {machine}!{check} {message}"
     payload = {
         "token": api_cfg["pushover_token"],
         "user": api_cfg["pushover_user"],
@@ -28,7 +28,7 @@ def notify_pushover(machine, check, message, time_check):
         "priority": "1",
         "expire": "3600",
         "retry": "90",
-        "title": "Alert from mownitoring: " + machine + "!" + check
+        "title": "Alert from mownitoring: {machine}!{check}"
     }
 
     p = requests.post(api_cfg["pushover_api_url"], params=payload)
@@ -40,20 +40,19 @@ def notify_pushover(machine, check, message, time_check):
 
 def notify_syslog(machine, check, message, time_check):
     """Notify through syslog."""
-    alert = time_check + ": " + machine + "!" + check + " " + message
+    alert = f"{time_check}: {machine}!{check} {message}"
     syslog.syslog(syslog.LOG_WARNING, alert)
 
 
 def notify_mail(machine, check, message, time_check):
     """Notify through email."""
     body = ("Hi,\n"
-            "On " + time_check + ", we detected a change on "
-            "" + machine + " for the check " + check + ":\n\n"
-            "" + message + "\n\n"
+            f"On {time_check}, we detected a change on "
+            f"{machine} for the check {check}:\n\n{message}\n\n"
             "Yours truly,\n-- \n"
             "Mownitoring")
     msg = email.mime.text.MIMEText(str(body))
-    msg['Subject'] = "Alert from mownitoring: " + machine + "!" + check
+    msg['Subject'] = f"Alert from mownitoring: {machine}!{check}"
     msg['From'] = api_cfg["mail_from"]
     msg['To'] = api_cfg["mail_to"]
     s = smtplib.SMTP(api_cfg["mail_server"])
@@ -68,7 +67,7 @@ def craft_sms(machine, check, message, time_check):
     time_check = time_check[-5:]
     # remove the domain
     machine = machine.split('.')[0]
-    alert = time_check + " " + machine + "!" + check + " " + message
+    alert = f'{time_check} {machine}!{check} {message}'
     return alert[0:156]
 
 
@@ -87,7 +86,7 @@ def notify_twilio(machine, check, message, time_check):
         auth=(api_cfg["twilio_account_sid"], api_cfg["twilio_auth_token"]))
     if p.status_code != HTTPStatus.CREATED:
         syslog.syslog(syslog.LOG_ERR, 'Problem while sending twilio')
-    syslog.syslog('SMS sent with twilio to ' + api_cfg["twilio_dest"])
+    syslog.syslog(f'SMS sent with twilio to {api_cfg["twilio_dest"]}')
 
 
 def check_nrpe(check, host, port):
@@ -113,7 +112,7 @@ def check_notifier(notifiers):
             notifiers_valid.append(notifiers_available[notifier])
         except KeyError:
             syslog.syslog(syslog.LOG_ERR,
-                          "Unknown notifier " + notifier + " configured")
+                          f"Unknown notifier {notifier} configured")
     return notifiers_valid
 
 
@@ -146,7 +145,7 @@ def check_status(check, host, port, machine, notifiers, conn):
         else:
             if logged_status[0] != 0:
                 alert = ("Already known state but still a problem for " +
-                         machine + "!" + check)
+                         f"{machine}!{check}")
                 syslog.syslog(alert)
         if status == 0:
             param = (machine, check)
