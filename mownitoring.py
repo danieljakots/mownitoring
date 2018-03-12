@@ -142,15 +142,18 @@ def check_status(check, host, port, machine, notifiers, conn):
     if logged_status:
         if logged_status[0] != status:
             notify(check, message, machine, notifiers, timestamp)
+            if status != 0:
+                param = (status, machine, check)
+                c.execute('UPDATE mownitoring SET status = ? WHERE ' +
+                          'machine=? AND check_name=?', param)
+            else:
+                param = (machine, check)
+                c.execute('DELETE FROM mownitoring ' +
+                          'WHERE machine=? AND check_name=?', param)
         else:
-            if logged_status[0] != 0:
-                alert = ("Already known state but still a problem for " +
-                         f"{machine}!{check}")
-                syslog.syslog(alert)
-        if status == 0:
-            param = (machine, check)
-            c.execute('DELETE FROM mownitoring ' +
-                      'WHERE machine=? AND check_name=?', param)
+            alert = ("Already known state but still a problem for " +
+                     f"{machine}!{check}")
+            syslog.syslog(alert)
     else:
         if status != 0:
             param = (machine, check, status, timestamp.strftime('%s'))
