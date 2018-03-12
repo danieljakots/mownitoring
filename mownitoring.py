@@ -3,6 +3,8 @@
 import smtplib
 import email.mime.text
 
+from http import HTTPStatus
+
 import sqlite3
 import subprocess
 import syslog
@@ -30,7 +32,7 @@ def notify_pushover(machine, check, message, time_check):
     }
 
     p = requests.post(api_cfg["pushover_api_url"], params=payload)
-    if p.status_code == 200:
+    if p.status_code == HTTPStatus.OK:
         syslog.syslog("Alert sent through pushover")
     else:
         syslog.syslog(syslog.LOG_ERR, "Sending through pushover didn't work")
@@ -83,7 +85,7 @@ def notify_twilio(machine, check, message, time_check):
         api_cfg["twilio_api_url"],
         data=payload,
         auth=(api_cfg["twilio_account_sid"], api_cfg["twilio_auth_token"]))
-    if p.status_code != 201:
+    if p.status_code != HTTPStatus.CREATED:
         syslog.syslog(syslog.LOG_ERR, 'Problem while sending twilio')
     syslog.syslog('SMS sent with twilio to ' + api_cfg["twilio_dest"])
 
