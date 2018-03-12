@@ -29,7 +29,8 @@ It parses the configuration and then for each service of each host,
 the script calls check_nrpe to get the return code and the message. If
 the return code is not 0 it sends a notification and stores the return
 code in a sqlite database. If the return code is different than the
-one stored, it sends a notification.
+one stored, it sends a notification. It abides by the rule: *You only notify
+once*.
 
 ## What are the supported notification systems?
 
