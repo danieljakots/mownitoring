@@ -136,10 +136,10 @@ def check_status(check, host, port, machine, notifiers, conn):
     try:
         c.execute('SELECT status FROM mownitoring ' +
                   'WHERE machine=? AND check_name=?', param)
+        logged_status = c.fetchone()
     except sqlite3.OperationalError:
-        pass
-    logged_status = c.fetchone()
-    if logged_status:
+        logged_status = None
+    if logged_status is not None:
         if logged_status[0] != status:
             notify(check, message, machine, notifiers, timestamp)
             if status != 0:
