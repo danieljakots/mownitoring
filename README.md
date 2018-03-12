@@ -14,7 +14,8 @@ their checks. Add the script in your crontab(1) if it suits your need.
 
 ## What are the requirements?
 
-Python 3.6, requests and yaml.
+Python 3.6 and the following libraries: requests and yaml. You also need
+check_nrpe (*nrpe* package on OpenBSD).
 
 ## What is the use case?
 
