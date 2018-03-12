@@ -7,8 +7,8 @@
 
 # Usage
 
-Copy `mownitoring.yml` in `/etc/` and configures your machines and
-their checks. Add the script in your crontab(1) if it suits your need.
+Copy `mownitoring.yml` in `/etc/` and configure your machines and
+their checks. Add the script in your crontab(1) if it suits your needs.
 
 # FAQ
 
