@@ -38,8 +38,8 @@ once*.
 * email
 * [Twilio](https://www.twilio.com/)
 
-It also logs what is happening (but that's not really a notification system
-per se).
+It also logs to syslog what is happening (but that's not really a
+notification system per se).
 
 ## How do I 'acknowledge' an alert?
 
