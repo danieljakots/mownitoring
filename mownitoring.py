@@ -5,6 +5,7 @@ import email.mime.text
 
 from http import HTTPStatus
 
+import concurrent.futures
 import datetime
 import sqlite3
 import subprocess
@@ -236,19 +237,24 @@ def sqlite_init(sqlite_file):
     return conn
 
 
+def check_machine(machines, machine):
+    for check in machines[machine][0]["checks"]:
+        try:
+            host = machines[machine][2]["connection"]["ip"]
+            port = machines[machine][2]["connection"]["port"]
+        except IndexError:
+            host = machine
+            port = "5666"
+        check_status(check, host, port, machine,
+                     machines[machine][1]["alert"], conn)
+
+
 if __name__ == "__main__":
     syslog.syslog("mownitoring starts")
     machines = read_conf(CONFIG_FILE)
     conn = sqlite_init(SQLITE_FILE)
-    for machine in machines["machines"]:
-        for check in machines[machine][0]["checks"]:
-            try:
-                host = machines[machine][2]["connection"]["ip"]
-                port = machines[machine][2]["connection"]["port"]
-            except IndexError:
-                host = machine
-                port = "5666"
-            check_status(check, host, port, machine,
-                         machines[machine][1]["alert"], conn)
+    with concurrent.futures.ProcessPoolExecutor(max_workers=4) as executor:
+        checks = {executor.submit(check_machine, machines, machine):
+                  machine for machine in machines["machines"]}
     conn.close()
     syslog.syslog("mownitoring ends")
