@@ -133,6 +133,8 @@ def check_status(check, host, port, machine, notifiers, conn):
     """Choose if we send an alert."""
     timestamp = datetime.datetime.now()
     status, message = check_nrpe(check, host, port)
+    if status == 255:
+        message = "Connection refused"
     c = conn.cursor()
     param = (machine, check)
     try:
