@@ -5,10 +5,10 @@ import email.mime.text
 
 from http import HTTPStatus
 
+import datetime
 import sqlite3
 import subprocess
 import syslog
-import datetime
 
 import requests
 import yaml
