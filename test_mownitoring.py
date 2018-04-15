@@ -66,7 +66,7 @@ class TestMownitoring(unittest.TestCase):
                 "-Hwebserver.example.com", "-ccheck_disk1", "-p5666"
             ],
             stdout=-1,
-            universal_newlines=True)
+            encoding='utf-8')
 
     @patch('syslog.syslog')
     @patch('mownitoring.check_notifier')

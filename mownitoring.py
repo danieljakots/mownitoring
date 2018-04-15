@@ -94,7 +94,7 @@ def check_nrpe(check, host, port):
     nrpe = subprocess.run(
         [CHECKNRPE_BIN, "-t30", "-H" + host, "-ccheck_" + check, "-p" + port],
         stdout=subprocess.PIPE,
-        universal_newlines=True)
+        encoding="utf-8")
     return nrpe.returncode, nrpe.stdout
 
 
