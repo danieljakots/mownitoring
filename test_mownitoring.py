@@ -67,6 +67,7 @@ class TestMownitoring(unittest.TestCase):
                 "-p", "5666"
             ],
             stdout=-1,
+            stderr=-3,
             encoding='utf-8')
 
     @patch('syslog.syslog')
