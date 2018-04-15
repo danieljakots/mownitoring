@@ -92,7 +92,8 @@ def notify_twilio(machine, check, message, time_check):
 def check_nrpe(check, host, port):
     """Run a given check for a specified host."""
     nrpe = subprocess.run(
-        [CHECKNRPE_BIN, "-t30", "-H" + host, "-ccheck_" + check, "-p" + port],
+        [CHECKNRPE_BIN,
+            "-t", "30", "-H", host, "-c", "check_" + check, "-p", port],
         stdout=subprocess.PIPE,
         encoding="utf-8")
     return nrpe.returncode, nrpe.stdout
