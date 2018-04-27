@@ -73,9 +73,8 @@ class TestMownitoring(unittest.TestCase):
     def test_check_status1(self):
         mownitoring.check_nrpe = Mock()
         mownitoring.check_nrpe.return_value = 2, 'disk nok'
-        ts, status, message = mownitoring.check_status("disk1",
-                                                       "webserver.example.com",
-                                                       "5666")
+        ts, status, message = mownitoring.check_status("webserver.example.com",
+                                                       "5666", "disk1")
         self.assertEqual(2, status)
         self.assertEqual("disk nok", message)
 
@@ -91,9 +90,8 @@ class TestMownitoring(unittest.TestCase):
         datetime.datetime = NewDate
         mock_check_notifier.return_value = [mownitoring.notify_syslog]
         conn = mownitoring.sqlite_init(":memory:")
-        ts, status, message = mownitoring.check_status("disk1",
-                                                       "webserver.example.com",
-                                                       "5666")
+        ts, status, message = mownitoring.check_status("webserver.example.com",
+                                                       "5666", "disk1")
         mownitoring.register_and_alert("disk1", "webserver.example.com",
                                        "5666", "webserver.example.com",
                                        ["syslog"], conn, ts, status, message)

@@ -130,7 +130,7 @@ def notify(check, message, machine, notifiers, timestamp):
         syslog.syslog(syslog.LOG_ERR, "No valid notify system")
 
 
-def check_status(check, host, port):
+def check_status(host, port="5666", check="ping"):
     """Choose if we send an alert."""
     timestamp = datetime.datetime.now()
     status, message = check_nrpe(check, host, port)
@@ -250,7 +250,7 @@ def check_machine(machines, machine):
         except IndexError:
             host = machine
             port = "5666"
-        timestamp, status, message = check_status(check, host, port)
+        timestamp, status, message = check_status(host, port, check)
         register_and_alert(check, host, port, machine,
                            machines[machine][1]["alert"], conn, status,
                            message, timestamp)
