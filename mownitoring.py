@@ -15,6 +15,7 @@ import requests
 import yaml
 
 CHECKNRPE_BIN = "/usr/local/libexec/nagios/check_nrpe"
+CHECKPING_BIN = "/usr/local/libexec/nagios/check_ping"
 CONFIG_FILE = "/etc/mownitoring.yml"
 SQLITE_FILE = "/tmp/mownitoring.sqlite"
 
@@ -101,6 +102,18 @@ def check_nrpe(check, host, port):
     return nrpe.returncode, nrpe.stdout
 
 
+def check_ping(host):
+    """Run check_ping for a specified host."""
+    nrpe = subprocess.run(
+        [CHECKPING_BIN,
+            "-t", "30", "-H", host, "-w", "500,10%", "-c", "1000,50%",
+            "-p", "5"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        encoding="utf-8")
+    return nrpe.returncode, nrpe.stdout
+
+
 def check_notifier(notifiers):
     """Check the configured notifier really exists."""
     notifiers_available = {
@@ -133,9 +146,12 @@ def notify(check, message, machine, notifiers, timestamp):
 def check_status(host, port="5666", check="ping"):
     """Choose if we send an alert."""
     timestamp = datetime.datetime.now()
-    status, message = check_nrpe(check, host, port)
-    if status == 255:
-        message = "Connection refused"
+    if check == "ping":
+        status, message = check_ping(host)
+    else:
+        status, message = check_nrpe(check, host, port)
+        if status == 255:
+            message = "Connection refused"
     return timestamp, status, message
 
 
@@ -243,17 +259,22 @@ def sqlite_init(sqlite_file):
 
 
 def check_machine(machines, machine):
-    for check in machines[machine][0]["checks"]:
-        try:
-            host = machines[machine][2]["connection"]["ip"]
-            port = machines[machine][2]["connection"]["port"]
-        except IndexError:
-            host = machine
-            port = "5666"
-        timestamp, status, message = check_status(host, port, check)
-        register_and_alert(check, host, port, machine,
-                           machines[machine][1]["alert"], conn, status,
-                           message, timestamp)
+    try:
+        host = machines[machine][2]["connection"]["ip"]
+        port = machines[machine][2]["connection"]["port"]
+    except IndexError:
+        host = machine
+        port = "5666"
+    timestamp, status, message = check_status(host, "ping")
+    register_and_alert("ping", host, "5666", machine,
+                       machines[machine][1]["alert"], conn, timestamp, status,
+                       message)
+    if status == 0:
+        for check in machines[machine][0]["checks"]:
+            timestamp, status, message = check_status(host, port, check)
+            register_and_alert(check, host, port, machine,
+                               machines[machine][1]["alert"], conn, timestamp,
+                               status, message)
 
 
 if __name__ == "__main__":
