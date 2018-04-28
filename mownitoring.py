@@ -14,8 +14,7 @@ import syslog
 import requests
 import yaml
 
-CHECKNRPE_BIN = "/usr/local/libexec/nagios/check_nrpe"
-CHECKPING_BIN = "/usr/local/libexec/nagios/check_ping"
+NAGIOS_CHECK_PATH = "/usr/local/libexec/nagios"
 CONFIG_FILE = "/etc/mownitoring.yml"
 SQLITE_FILE = "/tmp/mownitoring.sqlite"
 
@@ -94,7 +93,7 @@ def notify_twilio(machine, check, message, time_check):
 def check_nrpe(check, host, port):
     """Run a given check for a specified host."""
     nrpe = subprocess.run(
-        [CHECKNRPE_BIN,
+        [NAGIOS_CHECK_PATH + "/check_nrpe",
             "-t", "30", "-H", host, "-c", "check_" + check, "-p", port],
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL,
@@ -105,7 +104,7 @@ def check_nrpe(check, host, port):
 def check_ping(host):
     """Run check_ping for a specified host."""
     nrpe = subprocess.run(
-        [CHECKPING_BIN,
+        [NAGIOS_CHECK_PATH + "/check_ping",
             "-t", "30", "-H", host, "-w", "500,10%", "-c", "1000,50%",
             "-p", "5"],
         stdout=subprocess.PIPE,
