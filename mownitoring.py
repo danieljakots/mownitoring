@@ -17,6 +17,7 @@ import yaml
 NAGIOS_CHECK_PATH = "/usr/local/libexec/nagios"
 CONFIG_FILE = "/etc/mownitoring.yml"
 SQLITE_FILE = "/tmp/mownitoring.sqlite"
+MAX_WORKERS = 4
 
 
 def notify_pushover(machine, check, message, time_check):
@@ -280,7 +281,8 @@ if __name__ == "__main__":
     syslog.syslog("mownitoring starts")
     machines = read_conf(CONFIG_FILE)
     conn = sqlite_init(SQLITE_FILE)
-    with concurrent.futures.ProcessPoolExecutor(max_workers=4) as executor:
+    with concurrent.futures.ProcessPoolExecutor(max_workers=MAX_WORKERS) \
+            as executor:
         checks = {executor.submit(check_machine, machines, machine):
                   machine for machine in machines["machines"]}
     conn.close()
