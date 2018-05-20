@@ -291,7 +291,7 @@ def check_machine(machines, machine):
 
 
 if __name__ == "__main__":
-    if sys.argv[1]:
+    if len(sys.argv) > 1:
         CONFIG_FILE = sys.argv[1]
     syslog.syslog("mownitoring starts")
     machines = read_conf(CONFIG_FILE)
