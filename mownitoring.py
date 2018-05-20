@@ -115,7 +115,7 @@ def check_ping(host):
 
 
 def check_notifier(notifiers):
-    """Check the configured notifier really exists."""
+    """Check if the configured notifier really exists."""
     notifiers_available = {
         "syslog": notify_syslog,
         "pushover": notify_pushover,
