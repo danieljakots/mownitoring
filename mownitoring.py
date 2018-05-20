@@ -157,6 +157,9 @@ def run_check(host, port="5666", check="ping"):
 
 def register_and_alert(check, host, port, machine, notifiers, conn,
                        timestamp, status, message):
+    """Check if the state has changed and if so, notify and save the new state
+    in the DB.
+    """
     c = conn.cursor()
     param = (machine, check)
     try:
