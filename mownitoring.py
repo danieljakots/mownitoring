@@ -205,6 +205,8 @@ def read_conf(config_file):
     global api_cfg
     api_cfg = {}
 
+    configured_notifier = []
+
     try:
         pushover = {
             "pushover_token":
@@ -215,6 +217,7 @@ def read_conf(config_file):
             yaml_cfg["Alerting_credentials"]["Pushover"]["api_url"]
         }
         api_cfg.update(pushover)
+        configured_notifier.append("pushover")
     except KeyError:
         syslog.syslog(syslog.LOG_ERR, "Pushover config is wrong or missing")
 
@@ -225,6 +228,7 @@ def read_conf(config_file):
             "mail_server": yaml_cfg["Alerting_credentials"]["Mail"]["server"]
         }
         api_cfg.update(mail)
+        configured_notifier.append("mail")
     except KeyError:
         syslog.syslog(syslog.LOG_ERR, "Mail config is wrong or missing")
 
@@ -242,8 +246,12 @@ def read_conf(config_file):
             yaml_cfg["Alerting_credentials"]["Twilio"]["api_url"]
         }
         api_cfg.update(twilio)
+        configured_notifier.append("twilio")
     except KeyError:
         syslog.syslog(syslog.LOG_ERR, "Twilio config is wrong or missing")
+
+    if not configured_notifier:
+        syslog.syslog(syslog.LOG_ERR, "No alerting system configured!")
 
     # monitored machines
     machines = yaml_cfg.copy()
