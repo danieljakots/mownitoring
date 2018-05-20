@@ -9,6 +9,7 @@ import concurrent.futures
 import datetime
 import sqlite3
 import subprocess
+import sys
 import syslog
 
 import requests
@@ -199,6 +200,7 @@ def read_conf(config_file):
     - machines: a *returned* dict with informations about the machines
       we're monitoring
     """
+    # No need to try catch FileNotFoundError, error message is clear enough
     with open(config_file, 'r') as ymlfile:
         yaml_cfg = yaml.load(ymlfile)
 
@@ -289,6 +291,8 @@ def check_machine(machines, machine):
 
 
 if __name__ == "__main__":
+    if sys.argv[1]:
+        CONFIG_FILE = sys.argv[1]
     syslog.syslog("mownitoring starts")
     machines = read_conf(CONFIG_FILE)
     conn = sqlite_init(SQLITE_FILE)
