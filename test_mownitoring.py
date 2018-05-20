@@ -20,7 +20,7 @@ class NewDate(datetime.datetime):
 
 class TestMownitoring(unittest.TestCase):
     def test_readconf(self):
-        machines = mownitoring.read_conf(config_file)
+        machines, max_workers, sqlite_file = mownitoring.read_conf(config_file)
 
         # api_cfg
         self.assertEqual(mownitoring.api_cfg["pushover_token"], "T0k3n")
@@ -59,6 +59,7 @@ class TestMownitoring(unittest.TestCase):
 
     @patch('subprocess.run')
     def test_check_nrpe(self, mock_subprocess):
+        machines, max_workers, sqlite_file = mownitoring.read_conf(config_file)
         mownitoring.check_nrpe("disk1", "webserver.example.com", "5666")
         mock_subprocess.assert_called_once_with(
             [

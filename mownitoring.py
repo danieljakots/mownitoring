@@ -15,10 +15,6 @@ import syslog
 import requests
 import yaml
 
-NAGIOS_CHECK_PATH = "/usr/local/libexec/nagios"
-SQLITE_FILE = "/tmp/mownitoring.sqlite"
-MAX_WORKERS = 4
-
 
 def notify_pushover(machine, check, message, time_check):
     """Notify through Pushover."""
@@ -95,7 +91,8 @@ def check_nrpe(check, host, port):
     """Run a given check for a specified host."""
     nrpe = subprocess.run(
         [NAGIOS_CHECK_PATH + "/check_nrpe",
-            "-t", "30", "-H", host, "-c", "check_" + check, "-p", port],
+            "-t", f'{CHECK_NRPE_TIMEOUT}',
+            "-H", host, "-c", "check_" + check, "-p", port],
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL,
         encoding="utf-8")
@@ -106,7 +103,9 @@ def check_ping(host):
     """Run check_ping for a specified host."""
     nrpe = subprocess.run(
         [NAGIOS_CHECK_PATH + "/check_ping",
-            "-t", "30", "-H", host, "-w", "500,10%", "-c", "1000,50%",
+            "-t", f'{CHECK_NRPE_TIMEOUT}', "-H", host,
+            "-w", f"{CHECK_PING_LATENCY_WARN},{CHECK_PING_LOSS_WARN}%",
+            "-c", f"{CHECK_PING_LATENCY_CRIT},{CHECK_PING_LOSS_CRIT}%",
             "-p", "5"],
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL,
@@ -254,11 +253,38 @@ def read_conf(config_file):
     if not configured_notifier:
         syslog.syslog(syslog.LOG_ERR, "No alerting system configured!")
 
+    global NAGIOS_CHECK_PATH
+    NAGIOS_CHECK_PATH = yaml_cfg["Parameters"]["nagios_check_path"]
+    global CHECK_NRPE_TIMEOUT
+    CHECK_NRPE_TIMEOUT = int(yaml_cfg["Parameters"]["check_nrpe_timeout"])
+
+    global CHECK_PING_LATENCY_WARN
+    CHECK_PING_LATENCY_WARN = int(
+            yaml_cfg["Parameters"]["check_ping_latency_warn"]
+    )
+    global CHECK_PING_LOSS_WARN
+    CHECK_PING_LOSS_WARN = int(
+            yaml_cfg["Parameters"]["check_ping_loss_warn"]
+    )
+
+    global CHECK_PING_LATENCY_CRIT
+    CHECK_PING_LATENCY_CRIT = int(
+            yaml_cfg["Parameters"]["check_ping_latency_crit"]
+    )
+    global CHECK_PING_LOSS_CRIT
+    CHECK_PING_LOSS_CRIT = int(
+            yaml_cfg["Parameters"]["check_ping_loss_crit"]
+    )
+
+    max_workers = yaml_cfg["Parameters"]["workers"]
+    sqlite_file = yaml_cfg["Parameters"]["sqlite_file"]
+
     # monitored machines
     machines = yaml_cfg.copy()
     del machines["Alerting_credentials"]
+    del machines["Parameters"]
 
-    return machines
+    return machines, max_workers, sqlite_file
 
 
 def sqlite_init(sqlite_file):
@@ -294,9 +320,9 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         config_file = sys.argv[1]
     syslog.syslog("mownitoring starts")
-    machines = read_conf(config_file)
-    conn = sqlite_init(SQLITE_FILE)
-    with concurrent.futures.ProcessPoolExecutor(max_workers=MAX_WORKERS) \
+    machines, max_workers, sqlite_file = read_conf(config_file)
+    conn = sqlite_init(sqlite_file)
+    with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) \
             as executor:
         checks = {executor.submit(check_machine, machines, machine):
                   machine for machine in machines["machines"]}

@@ -45,6 +45,17 @@ mail.example.com:
       port: "5666"
 
 
+Parameters:
+  workers: 4
+  sqlite_file: "/tmp/mownitoring.sqlite"
+  nagios_check_path: "/usr/local/libexec/nagios"
+  check_nrpe_timeout: 30
+  check_ping_latency_warn: 500
+  check_ping_loss_warn: 10
+  check_ping_latency_crit: 1000
+  check_ping_loss_crit: 50
+ 
+
 Alerting_credentials:
   Pushover:
     token: "T0k3n"
@@ -61,3 +72,4 @@ Alerting_credentials:
     sender: "+14385556677"
     dest: "+33601020304"
     api_url: "https://api.twilio.com/2010-04-01/Accounts/11235811/Messages"
+
