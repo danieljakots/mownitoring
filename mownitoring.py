@@ -16,7 +16,6 @@ import requests
 import yaml
 
 NAGIOS_CHECK_PATH = "/usr/local/libexec/nagios"
-CONFIG_FILE = "/etc/mownitoring.yml"
 SQLITE_FILE = "/tmp/mownitoring.sqlite"
 MAX_WORKERS = 4
 
@@ -291,10 +290,11 @@ def check_machine(machines, machine):
 
 
 if __name__ == "__main__":
+    config_file = "/etc/mownitoring.yml"
     if len(sys.argv) > 1:
-        CONFIG_FILE = sys.argv[1]
+        config_file = sys.argv[1]
     syslog.syslog("mownitoring starts")
-    machines = read_conf(CONFIG_FILE)
+    machines = read_conf(config_file)
     conn = sqlite_init(SQLITE_FILE)
     with concurrent.futures.ProcessPoolExecutor(max_workers=MAX_WORKERS) \
             as executor:
