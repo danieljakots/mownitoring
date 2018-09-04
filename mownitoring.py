@@ -11,6 +11,7 @@ from http import HTTPStatus
 
 import concurrent.futures
 import datetime
+import os
 import sqlite3
 import subprocess
 import sys
@@ -261,6 +262,13 @@ def read_conf(config_file):
     NAGIOS_CHECK_PATH = yaml_cfg["Parameters"]["nagios_check_path"]
     global CHECK_NRPE_TIMEOUT
     CHECK_NRPE_TIMEOUT = int(yaml_cfg["Parameters"]["check_nrpe_timeout"])
+
+    if not os.path.isfile(NAGIOS_CHECK_PATH + "/check_nrpe"):
+        raise FileNotFoundError("No such file or directory: "
+                                f"{NAGIOS_CHECK_PATH}/check_nrpe")
+    if not os.path.isfile(NAGIOS_CHECK_PATH + "/check_ping"):
+        raise FileNotFoundError("No such file or directory: "
+                                f"{NAGIOS_CHECK_PATH}/check_ping")
 
     global CHECK_PING_LATENCY_WARN
     CHECK_PING_LATENCY_WARN = int(
