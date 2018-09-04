@@ -320,7 +320,7 @@ def check_machine(machines, machine):
 
 
 if __name__ == "__main__":
-    if not sys.version_info >= (3,6):
+    if not sys.version_info >= (3, 6):
         print("You need python 3.6 or later")
         sys.exit(1)
     config_file = "/etc/mownitoring.yml"
