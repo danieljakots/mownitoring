@@ -339,7 +339,7 @@ if __name__ == "__main__":
     conn = sqlite_init(sqlite_file)
     with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) \
             as executor:
-        checks = {executor.submit(check_machine, machines, machine):
-                  machine for machine in machines["machines"]}
+        {executor.submit(check_machine, machines, machine, sqlite_file):
+            machine for machine in machines["machines"]}
     conn.close()
     syslog.syslog("mownitoring ends")
