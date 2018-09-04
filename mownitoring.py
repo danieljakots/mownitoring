@@ -263,13 +263,6 @@ def read_conf(config_file):
     global CHECK_NRPE_TIMEOUT
     CHECK_NRPE_TIMEOUT = int(yaml_cfg["Parameters"]["check_nrpe_timeout"])
 
-    if not os.path.isfile(NAGIOS_CHECK_PATH + "/check_nrpe"):
-        raise FileNotFoundError("No such file or directory: "
-                                f"{NAGIOS_CHECK_PATH}/check_nrpe")
-    if not os.path.isfile(NAGIOS_CHECK_PATH + "/check_ping"):
-        raise FileNotFoundError("No such file or directory: "
-                                f"{NAGIOS_CHECK_PATH}/check_ping")
-
     global CHECK_PING_LATENCY_WARN
     CHECK_PING_LATENCY_WARN = int(
             yaml_cfg["Parameters"]["check_ping_latency_warn"]
@@ -338,6 +331,14 @@ if __name__ == "__main__":
         config_file = sys.argv[1]
     syslog.syslog("mownitoring starts")
     machines, max_workers, sqlite_file = read_conf(config_file)
+
+    if not os.path.isfile(NAGIOS_CHECK_PATH + "/check_nrpe"):
+        raise FileNotFoundError("No such file or directory: "
+                                f"{NAGIOS_CHECK_PATH}/check_nrpe")
+    if not os.path.isfile(NAGIOS_CHECK_PATH + "/check_ping"):
+        raise FileNotFoundError("No such file or directory: "
+                                f"{NAGIOS_CHECK_PATH}/check_ping")
+
     sqlite_init(sqlite_file)
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) \
             as executor:
