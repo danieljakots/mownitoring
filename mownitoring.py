@@ -339,7 +339,7 @@ if __name__ == "__main__":
     syslog.syslog("mownitoring starts")
     machines, max_workers, sqlite_file = read_conf(config_file)
     sqlite_init(sqlite_file)
-    with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) \
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) \
             as executor:
         {executor.submit(check_machine, machines, machine, sqlite_file):
             machine for machine in machines["machines"]}
