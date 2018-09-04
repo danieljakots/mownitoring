@@ -125,9 +125,10 @@ class TestMownitoring(unittest.TestCase):
         mock_notify_pushover.assert_not_called()
         conn.close()
 
+    @patch('syslog.syslog')
     @patch('smtplib.SMTP')
     @patch('email.mime.text.MIMEText')
-    def test_notify_mail(self, mock_mimetext, mock_smtp):
+    def test_notify_mail(self, mock_mimetext, mock_smtp, mock_syslog):
         # we need api_cfg
         mownitoring.read_conf(config_file)
         test_body = ("Hi,\n"
