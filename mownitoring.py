@@ -305,10 +305,10 @@ def sqlite_init(sqlite_file):
     with conn:
         conn.execute('CREATE TABLE IF NOT EXISTS mownitoring (machine TEXT, ' +
                      'check_name TEXT, status INTEGER, mtime INTEGER);')
-    return conn
+    conn.close()
 
 
-def check_machine(machines, machine):
+def check_machine(machines, machine, sqlite_file):
     try:
         host = machines[machine][2]["connection"]["ip"]
         port = machines[machine][2]["connection"]["port"]
@@ -316,6 +316,7 @@ def check_machine(machines, machine):
         host = machine
         port = "5666"
     timestamp, status, message = run_check(host, "ping")
+    conn = sqlite3.connect(sqlite_file)
     register_and_alert("ping", host, "5666", machine,
                        machines[machine][1]["alert"], conn, timestamp, status,
                        message)
@@ -325,6 +326,7 @@ def check_machine(machines, machine):
             register_and_alert(check, host, port, machine,
                                machines[machine][1]["alert"], conn, timestamp,
                                status, message)
+    conn.close()
 
 
 if __name__ == "__main__":
@@ -336,10 +338,9 @@ if __name__ == "__main__":
         config_file = sys.argv[1]
     syslog.syslog("mownitoring starts")
     machines, max_workers, sqlite_file = read_conf(config_file)
-    conn = sqlite_init(sqlite_file)
+    sqlite_init(sqlite_file)
     with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) \
             as executor:
         {executor.submit(check_machine, machines, machine, sqlite_file):
             machine for machine in machines["machines"]}
-    conn.close()
     syslog.syslog("mownitoring ends")
