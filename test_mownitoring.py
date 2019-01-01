@@ -9,7 +9,7 @@ import os
 
 import mownitoring
 
-config_file = "./mownitoring.yml"
+config_file = "./mownitoring.toml"
 
 SQLITE3_PATH = "/tmp/mownitoring-unittest.sqlite"
 

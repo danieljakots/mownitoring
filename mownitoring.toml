@@ -1,0 +1,52 @@
+machines = [ "webserver.example.com", "db.example.com", "mail.example.com",]
+
+[["webserver.example.com"]]
+checks = [ "disk1", "load", "ssh", "haproxy", "http", "https", "ssl",]
+[["webserver.example.com"]]
+alert = [ "pushover",]
+
+[["db.example.com"]]
+checks = [ "disk1", "load", "ssh",]
+[["db.example.com"]]
+alert = [ "pushover", "syslog",]
+[["db.example.com"]]
+["db.example.com".connection]
+ip = "192.0.2.2"
+port = "5667"
+
+[["mail.example.com"]]
+checks = [ "disk1", "load", "ssh", "mailq", "imap",]
+[["mail.example.com"]]
+alert = [ "pushover",]
+[["mail.example.com"]]
+["mail.example.com".connection]
+ip = "192.0.2.3"
+port = "5666"
+
+[Parameters]
+workers = 4
+sqlite_file = "/tmp/mownitoring.sqlite"
+nagios_check_path = "/usr/local/libexec/nagios"
+check_nrpe_timeout = 30
+check_ping_latency_warn = 500
+check_ping_loss_warn = 10
+check_ping_latency_crit = 1000
+check_ping_loss_crit = 50
+
+[Alerting_credentials.Pushover]
+token = "T0k3n"
+user = "johndoe"
+active = "True"
+api_url = "https://api.pushover.net/1/messages.json"
+
+[Alerting_credentials.Mail]
+from = "monitoring@example.com"
+to = "admin@example.com"
+server = "localhost"
+
+[Alerting_credentials.Twilio]
+account_sid = "11235811"
+auth_token = "3141592654"
+sender = "+14385556677"
+dest = "+33601020304"
+api_url = "https://api.twilio.com/2010-04-01/Accounts/11235811/Messages"

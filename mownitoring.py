@@ -18,7 +18,7 @@ import sys
 import syslog
 
 import requests
-import yaml
+import toml
 
 
 def notify_pushover(machine, check, message, time_check):
@@ -204,8 +204,8 @@ def read_conf(config_file):
       we're monitoring
     """
     # No need to try catch FileNotFoundError, error message is clear enough
-    with open(config_file, 'r') as ymlfile:
-        yaml_cfg = yaml.load(ymlfile)
+    with open(config_file, 'r') as tomlfile:
+        toml_cfg = toml.load(tomlfile)
 
     global api_cfg
     api_cfg = {}
@@ -215,11 +215,11 @@ def read_conf(config_file):
     try:
         pushover = {
             "pushover_token":
-            yaml_cfg["Alerting_credentials"]["Pushover"]["token"],
+            toml_cfg["Alerting_credentials"]["Pushover"]["token"],
             "pushover_user":
-            yaml_cfg["Alerting_credentials"]["Pushover"]["user"],
+            toml_cfg["Alerting_credentials"]["Pushover"]["user"],
             "pushover_api_url":
-            yaml_cfg["Alerting_credentials"]["Pushover"]["api_url"]
+            toml_cfg["Alerting_credentials"]["Pushover"]["api_url"]
         }
         api_cfg.update(pushover)
         configured_notifier.append("pushover")
@@ -228,9 +228,9 @@ def read_conf(config_file):
 
     try:
         mail = {
-            "mail_from": yaml_cfg["Alerting_credentials"]["Mail"]["from"],
-            "mail_to": yaml_cfg["Alerting_credentials"]["Mail"]["to"],
-            "mail_server": yaml_cfg["Alerting_credentials"]["Mail"]["server"]
+            "mail_from": toml_cfg["Alerting_credentials"]["Mail"]["from"],
+            "mail_to": toml_cfg["Alerting_credentials"]["Mail"]["to"],
+            "mail_server": toml_cfg["Alerting_credentials"]["Mail"]["server"]
         }
         api_cfg.update(mail)
         configured_notifier.append("mail")
@@ -240,15 +240,15 @@ def read_conf(config_file):
     try:
         twilio = {
             "twilio_account_sid":
-            yaml_cfg["Alerting_credentials"]["Twilio"]["account_sid"],
+            toml_cfg["Alerting_credentials"]["Twilio"]["account_sid"],
             "twilio_auth_token":
-            yaml_cfg["Alerting_credentials"]["Twilio"]["auth_token"],
+            toml_cfg["Alerting_credentials"]["Twilio"]["auth_token"],
             "twilio_sender":
-            yaml_cfg["Alerting_credentials"]["Twilio"]["sender"],
+            toml_cfg["Alerting_credentials"]["Twilio"]["sender"],
             "twilio_dest":
-            yaml_cfg["Alerting_credentials"]["Twilio"]["dest"],
+            toml_cfg["Alerting_credentials"]["Twilio"]["dest"],
             "twilio_api_url":
-            yaml_cfg["Alerting_credentials"]["Twilio"]["api_url"]
+            toml_cfg["Alerting_credentials"]["Twilio"]["api_url"]
         }
         api_cfg.update(twilio)
         configured_notifier.append("twilio")
@@ -259,33 +259,33 @@ def read_conf(config_file):
         syslog.syslog(syslog.LOG_ERR, "No alerting system configured!")
 
     global NAGIOS_CHECK_PATH
-    NAGIOS_CHECK_PATH = yaml_cfg["Parameters"]["nagios_check_path"]
+    NAGIOS_CHECK_PATH = toml_cfg["Parameters"]["nagios_check_path"]
     global CHECK_NRPE_TIMEOUT
-    CHECK_NRPE_TIMEOUT = int(yaml_cfg["Parameters"]["check_nrpe_timeout"])
+    CHECK_NRPE_TIMEOUT = int(toml_cfg["Parameters"]["check_nrpe_timeout"])
 
     global CHECK_PING_LATENCY_WARN
     CHECK_PING_LATENCY_WARN = int(
-            yaml_cfg["Parameters"]["check_ping_latency_warn"]
+            toml_cfg["Parameters"]["check_ping_latency_warn"]
     )
     global CHECK_PING_LOSS_WARN
     CHECK_PING_LOSS_WARN = int(
-            yaml_cfg["Parameters"]["check_ping_loss_warn"]
+            toml_cfg["Parameters"]["check_ping_loss_warn"]
     )
 
     global CHECK_PING_LATENCY_CRIT
     CHECK_PING_LATENCY_CRIT = int(
-            yaml_cfg["Parameters"]["check_ping_latency_crit"]
+            toml_cfg["Parameters"]["check_ping_latency_crit"]
     )
     global CHECK_PING_LOSS_CRIT
     CHECK_PING_LOSS_CRIT = int(
-            yaml_cfg["Parameters"]["check_ping_loss_crit"]
+            toml_cfg["Parameters"]["check_ping_loss_crit"]
     )
 
-    max_workers = yaml_cfg["Parameters"]["workers"]
-    sqlite_file = yaml_cfg["Parameters"]["sqlite_file"]
+    max_workers = toml_cfg["Parameters"]["workers"]
+    sqlite_file = toml_cfg["Parameters"]["sqlite_file"]
 
     # monitored machines
-    machines = yaml_cfg.copy()
+    machines = toml_cfg.copy()
     del machines["Alerting_credentials"]
     del machines["Parameters"]
 
@@ -326,7 +326,7 @@ if __name__ == "__main__":
     if not sys.version_info >= (3, 6):
         print("You need python 3.6 or later")
         sys.exit(1)
-    config_file = "/etc/mownitoring.yml"
+    config_file = "/etc/mownitoring.toml"
     if len(sys.argv) > 1:
         config_file = sys.argv[1]
     syslog.syslog("mownitoring starts")

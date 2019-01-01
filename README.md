@@ -7,17 +7,17 @@
 
 # Usage
 
-Copy `mownitoring.yml` in `/etc/` and configure your machines and
+Copy `mownitoring.toml` in `/etc/` and configure your machines and
 their checks. Add the script in your crontab(1) if it suits your needs.
 
 If you don't want to use the default path, you can call the script with your
-config file as an argument: `/path/to/mownitoring.py /path/to/mownitoring.yml`
+config file as an argument: `/path/to/mownitoring.py /path/to/mownitoring.toml`
 
 # FAQ
 
 ## What are the requirements?
 
-Python 3.6 and the following libraries: requests and yaml. You also need
+Python 3.6 and the following libraries: requests and toml. You also need
 check_nrpe (*nrpe* package on OpenBSD).
 
 ## What is the use case?
