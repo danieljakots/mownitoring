@@ -198,10 +198,11 @@ def register_and_alert(check, host, port, machine, notifiers, conn,
 def read_conf(config_file):
     """Parse the configuration file.
 
-    It uses 2 data structures:
-    - api_cfg: a global dict that contains the API keys
-    - machines: a *returned* dict with informations about the machines
-      we're monitoring
+    :param config_file: the path to the config writen in a toml format
+    :returns: machines (dict), max_workers (int), sqlite_file (path to DB)
+
+    It uses some global vars: api_cfg (dict) API keys and some path/parameters
+    for the check_nrpe.
     """
     # No need to try catch FileNotFoundError, error message is clear enough
     with open(config_file, 'r') as tomlfile:
