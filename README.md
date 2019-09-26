@@ -46,7 +46,7 @@ notification system per se).
 
 ## How do I 'acknowledge' an alert?
 
-You don't. You only get a notification if the service status changes.
+You don't. You only get a notification when the service status changes.
 
 ## Can I have pretty graphs?
 
